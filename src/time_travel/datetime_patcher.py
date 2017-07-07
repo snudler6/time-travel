@@ -5,15 +5,13 @@ import mock
 
 
 class datetime_patcher(object):
-    """
-    Context-manager patching the datetime module.
+    """Context-manager patching the datetime module.
     
     For now patching only the @today function.
     """
     
     def __init__(self, start_time=0):
-        """
-        Create the patch.
+        """Create the patch.
         
         @start_time is time in seconds since the epoch.
         """
