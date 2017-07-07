@@ -21,6 +21,8 @@ class datetime_patcher(object):
         
         today_mock = mock.Mock(side_effect=self.get_time)
         self.datetime.today = today_mock
+        
+        self.datetime_patcher = mock.patch('datetime.datetime', self.datetime)
 
     def set_time(self, timestamp):
         self.timestamp = timestamp
@@ -28,8 +30,12 @@ class datetime_patcher(object):
     def get_time(self):
         return self.real_datetime(self.timestamp)
     
-    def start(self):
-        patcher = mock.patch('datetime.datetime', self.datetime)
-        patcher.start()
+    def __enter__(self):
+        self.datetime_patcher.start()
+        
+        return self
+        
+    def __exit__(self, type, value, traceback):
+        self.datetime_patcher.stop()
 
         
