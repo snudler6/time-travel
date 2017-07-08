@@ -10,38 +10,36 @@ class TimePatcher(object):
         - time
     """
     
-    def __init__(self, start_time=0.0):
+    def __init__(self, clock):
         """Create the patch.
         
         @start_time is time in seconds since the epoch.
         """
-        self.timestamp = start_time
+        self.clock = clock
         
-        self.time_patch = mock.patch('time.time', side_effect=self.get_time)
-        self.sleep_patch = mock.patch('time.sleep',
-                                      side_effect=self.advance_time)
-        
-    def set_time(self, timestamp):
-        """Set the time returned by now functions.
-        
-        @timestamp - is time in seconds since the epoch.
-        """
-        self.timestamp = timestamp
-        
-    def get_time(self):
-        """Return a datetime object of the currently set time."""
-        return self.timestamp
+        self.patches = [mock.patch('time.time',
+                                   side_effect=self.clock.get_timestamp),
+                        mock.patch('time.sleep',
+                                   side_effect=self.clock.advance_timestamp),
+                        ]
     
-    def advance_time(self, secs):
-        """Increase the returned time in a given amount of seconds."""
-        self.timestamp += secs
-    
+#     def advance_time(self, secs):
+#         """Increase the returned time in a given amount of seconds."""
+#         self.clock.advance_time(secs)
+        
+    def start(self):
+        """Start mocking time module."""
+        for p in self.patches:
+            p.start()
+            
+    def stop(self):
+        """Stop mocking time module."""
+        for p in self.patches:
+                p.stop()
+                
     def __enter__(self):
-        self.time_patch.start()
-        self.sleep_patch.start()
-        
+        self.start()
         return self
         
-    def __exit__(self, _, _, _):
-        self.time_patch.stop()
-        self.sleep_patch.stop()
+    def __exit__(self, *args):
+        self.stop()

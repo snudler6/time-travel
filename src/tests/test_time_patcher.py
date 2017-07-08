@@ -1,21 +1,25 @@
 from time_travel.time_patcher import TimePatcher
+from time_travel.time_travel import TimeMachineClock
+
 import time
 
 
 def test_time_patch():
-    with TimePatcher() as t:
-        
+    clock = TimeMachineClock()
+    
+    with TimePatcher(clock):
         assert time.time() == 0
-        t.set_time(3600)
+        clock.timestamp = 3600
         assert time.time() == 3600
 
 
 def test_sleep_patch():
-    with TimePatcher() as t:
-        
+    clock = TimeMachineClock()
+    
+    with TimePatcher(clock):
         assert time.time() == 0
         time.sleep(3600)
         assert time.time() == 3600
         
-        t.set_time(7200)
+        clock.timestamp = 7200
         assert time.time() == 7200
