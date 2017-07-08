@@ -44,5 +44,5 @@ class DatetimePatcher(object):
         
         return self
         
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, _, _, _):
         self.datetime_patcher.stop()
