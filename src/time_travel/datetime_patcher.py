@@ -4,7 +4,7 @@ import datetime as datetime_lib
 import mock
 
 
-class datetime_patcher(object):
+class DatetimePatcher(object):
     """Context-manager patching the datetime module.
     
     For now patching only the @today function.

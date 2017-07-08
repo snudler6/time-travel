@@ -1,9 +1,9 @@
-from time_travel.datetime_patcher import datetime_patcher
+from time_travel.datetime_patcher import DatetimePatcher
 import datetime
 
 
-def test_datetime():
-    with datetime_patcher() as t:
+def test_datetime_patch():
+    with DatetimePatcher() as t:
         
         print datetime.datetime.today()
         t.set_time(3600)
