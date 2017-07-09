@@ -3,7 +3,6 @@
 import datetime as datetime_lib
 
 import mock
-from functools import partial
 
 
 class DatetimePatcher(object):
@@ -31,7 +30,7 @@ class DatetimePatcher(object):
                         ]
         
     def _now(self):
-        return self.real_fromtimestamp(self.clock.get_timestamp())
+        return self.real_fromtimestamp(self.clock.timestamp)
     
     def start(self):
         """Start mocking datetime module."""

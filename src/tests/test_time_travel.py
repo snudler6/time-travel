@@ -1,4 +1,4 @@
-from time_travel.time_travel import TimeTravel
+from time_travel import TimeTravel
 
 import time
 import datetime

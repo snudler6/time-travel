@@ -18,14 +18,17 @@ class TimePatcher(object):
         self.clock = clock
         
         self.patches = [mock.patch('time.time',
-                                   side_effect=self.clock.get_timestamp),
+                                   side_effect=self._get_timestamp),
                         mock.patch('time.sleep',
                                    side_effect=self.clock.advance_timestamp),
                         ]
     
-#     def advance_time(self, secs):
-#         """Increase the returned time in a given amount of seconds."""
-#         self.clock.advance_time(secs)
+    def _get_timestamp(self):
+        """Return the clock timestamp.
+        
+        Used for mocks side_effect, not to pre-evaluate the timestamp property.
+        """
+        return self.clock.timestamp
         
     def start(self):
         """Start mocking time module."""

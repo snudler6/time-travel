@@ -1,4 +1,4 @@
-from time_travel.time_patcher import TimePatcher
+from time_travel.patchers.time_patcher import TimePatcher
 from time_travel.time_travel import TimeMachineClock
 
 import time

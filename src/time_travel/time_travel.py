@@ -1,7 +1,12 @@
 """Mocking interface for python time libraries."""
 
-from datetime_patcher import DatetimePatcher
-from time_patcher import TimePatcher
+
+# from pytest import set_trace
+# set_trace()
+import sys
+print sys.path
+from patchers.datetime_patcher import DatetimePatcher
+from patchers.time_patcher import TimePatcher
 
 
 class TimeMachineClock(object):
@@ -10,10 +15,6 @@ class TimeMachineClock(object):
     def __init__(self, start_timestamp=0.0):
         """Initialize a unifing clock."""
         self._timestamp = start_timestamp
-        
-    def get_timestamp(self):
-        """Get the clock timestamp in seconds since the epoch."""
-        return self._timestamp
         
     @property
     def timestamp(self):
@@ -29,7 +30,7 @@ class TimeMachineClock(object):
         self._timestamp = float(timestatmp)
     
     def advance_timestamp(self, secs):
-        """Advance the clock timestamp since the epoch."""
+        """Advance the clock's timestamp in seconds."""
         self._timestamp += secs
         
 
@@ -43,9 +44,10 @@ class TimeTravel(object):
         """
         self.clock = TimeMachineClock(start_time)
         
-        self.patches = [DatetimePatcher(self.clock),
-                        TimePatcher(self.clock),
-                        ]
+        self.patches = [
+            DatetimePatcher(self.clock),
+            TimePatcher(self.clock),
+        ]
 
     def set_time(self, timestamp):
         """Set the time returned by now functions.
