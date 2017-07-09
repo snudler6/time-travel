@@ -1,21 +1,21 @@
 """A patch to the datetime module."""
 
-import datetime as datetime_lib
+from basic_patcher import BasicPatcher
 
+import datetime as datetime_lib
 import mock
 
 
-class DatetimePatcher(object):
-    """Context-manager patching the datetime module.
+class DatetimePatcher(BasicPatcher):
+    """Patcher of the datetime module.
     
-    For now patching only the @today function.
+    patching:
+        - datetime.today
     """
     
     def __init__(self, clock):
-        """Create the patch.
-        
-        @start_time is time in seconds since the epoch.
-        """
+        """Create the patch."""
+        super(DatetimePatcher, self).__init__(clock)
         self.clock = clock
         
         self.real_fromtimestamp = datetime_lib.datetime.fromtimestamp
@@ -31,20 +31,3 @@ class DatetimePatcher(object):
         
     def _now(self):
         return self.real_fromtimestamp(self.clock.timestamp)
-    
-    def start(self):
-        """Start mocking datetime module."""
-        for p in self.patches:
-            p.start()
-            
-    def stop(self):
-        """Stop mocking datetime module."""
-        for p in self.patches:
-                p.stop()
-                
-    def __enter__(self):
-        self.start()
-        return self
-        
-    def __exit__(self, *args):
-        self.stop()

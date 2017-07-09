@@ -9,11 +9,26 @@ real_fromtimestamp = datetime.datetime.fromtimestamp
 
 def test_datetime_patch():
     clock = TimeMachineClock()
-    with DatetimePatcher(clock):
-        assert datetime.datetime.today() == real_fromtimestamp(0)
-        
-        clock.timestamp = 3600
-        assert datetime.datetime.today() == real_fromtimestamp(3600)
+    patcher = DatetimePatcher(clock)
+    patcher.start()
+    
+    assert datetime.datetime.today() == real_fromtimestamp(0)
+    
+    clock.timestamp = 3600
+    assert datetime.datetime.today() == real_fromtimestamp(3600)
+    patcher.stop()
+    
+    
+def test_patcher_stop():
+    clock = TimeMachineClock()
+    patcher = DatetimePatcher(clock)
+    patcher.start()
+    
+    assert datetime.datetime.today() == real_fromtimestamp(0)
+    
+    patcher.stop()
+    
+    assert datetime.datetime.today() != real_fromtimestamp(0)
 
 
 def test_patch_not_covering_classmethods():
