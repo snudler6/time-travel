@@ -1,10 +1,7 @@
 from time_travel import TimeTravel
 
 import time
-import datetime
-
-
-real_fromtimestamp = datetime.datetime.fromtimestamp
+from datetime import datetime
 
 
 def test_time_patch_set_time():
@@ -29,17 +26,14 @@ def test_sleep_patch_sleep():
 def test_datetime_patch_set_time():
     with TimeTravel() as t:
         
-        print datetime.datetime.today()
+        assert datetime.today() == datetime.fromtimestamp(0)
         t.set_time(3600)
-        print datetime.datetime.today()
-        print datetime.datetime.fromtimestamp(7200)
-        
-        print datetime.datetime(2017, 7, 19)
+        assert datetime.today() == datetime.fromtimestamp(3600)
         
 
 def test_sleep_changing_today():
     with TimeTravel():
-        assert datetime.datetime.today() == real_fromtimestamp(0)
+        assert datetime.today() == datetime.fromtimestamp(0)
         
         time.sleep(3600)
-        assert datetime.datetime.today() == real_fromtimestamp(3600)
+        assert datetime.today() == datetime.fromtimestamp(3600)

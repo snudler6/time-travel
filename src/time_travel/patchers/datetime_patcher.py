@@ -18,8 +18,6 @@ class DatetimePatcher(BasicPatcher):
         super(DatetimePatcher, self).__init__(clock)
         self.clock = clock
         
-        self.real_fromtimestamp = datetime_lib.datetime.fromtimestamp
-        
         self.datetime = mock.Mock(wraps=datetime_lib.datetime)
         self.datetime.mock_add_spec(
             ["today", "now", "utcnow", "fromtimestamp"])
@@ -30,4 +28,4 @@ class DatetimePatcher(BasicPatcher):
                         ]
         
     def _now(self):
-        return self.real_fromtimestamp(self.clock.timestamp)
+        return self.datetime.fromtimestamp(self.clock.timestamp)
