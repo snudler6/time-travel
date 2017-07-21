@@ -5,7 +5,7 @@ class TimeMachineClock(object):
     """Unifing class for clock types."""
     
     def __init__(self, start_timestamp=0.0, clock_listeners=[]):
-        """Initialize a unifing clock."""
+        """Initialise a unifing clock."""
         self._timestamp = start_timestamp
         self._clock_listeners = clock_listeners
         
