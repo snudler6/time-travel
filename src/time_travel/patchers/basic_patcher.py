@@ -4,10 +4,14 @@
 class BasicPatcher(object):
     """Base class for patching time modules."""
     
-    def __init__(self, clock):
+    def __init__(self, clock, events_pool=None):
         """Create the patch."""
         self.clock = clock
+        self.events_pool = events_pool
+        
         self.patches = []
+                
+
         
     def start(self):
         """Start mocking datetime module."""

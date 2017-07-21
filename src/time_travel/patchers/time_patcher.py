@@ -13,9 +13,9 @@ class TimePatcher(BasicPatcher):
         - sleep
     """
     
-    def __init__(self, clock):
+    def __init__(self, *args, **kwargs):
         """Create the patch."""
-        super(TimePatcher, self).__init__(clock)
+        super(TimePatcher, self).__init__(*args, **kwargs)
         
         self.patches.append(
             mock.patch('time.time', side_effect=self._get_timestamp))
