@@ -7,10 +7,10 @@ import mock
 
 
 class SelectPatcher(BasicPatcher):
-    """Patcher of the datetime module.
+    """Patcher for select module.
     
     patching:
-        - datetime.today
+        - select.select
     """
     
     def __init__(self, *args, **kwargs):
