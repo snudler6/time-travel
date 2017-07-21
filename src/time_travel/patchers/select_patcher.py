@@ -42,12 +42,12 @@ class SelectPatcher(BasicPatcher):
             
             triggering_events = waited_events.intersection(events) 
             
-            if len(triggering_events) != 0:
+            if triggering_events:
                 result_events = list(triggering_events)
                 result_timestamp = timestamp
                 break
 
-        if timeout is None and len(result_events) == 0:
+        if timeout is None and not result_events:
             raise ValueError('No relevant future events were set fot infinite '
                              'timout')
 

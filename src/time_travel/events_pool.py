@@ -9,7 +9,12 @@ class EventsPool(object):
         self.future_events = {}
         
     def add_future_event(self, timestamp, event):
-        """Add an event to a given timestamp."""
+        """Add an event to a given timestamp.
+        
+        - timestamp: time in seconds since the epoch.
+        - event: any object (preferebly mock object) identifying the object
+                 that a patched event waiting function will be wait on. 
+        """
         self.future_events.setdefault(timestamp, set()).add(event)
         
     def get_events(self):
@@ -19,13 +24,16 @@ class EventsPool(object):
         [(timestamp1, set(events)), (timestamp2, set(events)), ....]
         where the timestamps are sorted.
         """
-        return sorted(self.future_events.items())
+        return sorted(self.future_events.items(), key=lambda x: x[0])
     
     def set_timestamp(self, timestamp):
         """Remove all events before the given timestamp.
         
-        This method should be called automatically after signing on the
-        TimeMachineClock.
+        - timestamp: time in seconds since the epoch.
+         
+        A callback function for time_machine_clock changes.
+        After a time has change, the pool can get rid of events, already
+        happened but no called in any patch.
         """
         self.future_events = {k: v for k, v in self.future_events.items()
                               if k >= timestamp}

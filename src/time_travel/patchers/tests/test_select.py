@@ -21,6 +21,13 @@ class TestSelectPatcher(object):
     def teardown_method(self, method):
         """Stop the select patcher"""
         self.patcher.stop()
+        
+    def test_basic_usage(self):
+        event = mock.MagicMock()
+        self.events_pool.add_future_event(2, event)
+        
+        assert select.select([event], [], [], 17) == [event]
+        assert self.clock.timestamp == 2
 
     def test_empty_lists(self):
         assert select.select([], [], [], 17) == []
