@@ -26,18 +26,18 @@ class TestSelectPatcher(object):
         event = mock.MagicMock()
         self.events_pool.add_future_event(2, event)
         
-        assert select.select([event], [], [], 17) == [event]
+        assert select.select([event], [], [], 17) == ([event], [], [])
         assert self.clock.timestamp == 2
 
     def test_empty_lists(self):
-        assert select.select([], [], [], 17) == []
+        assert select.select([], [], [], 17) == ([], [], [])
         assert self.clock.timestamp == 17
     
     def test_future_event_after_timeout(self):
         event = mock.MagicMock()
         self.events_pool.add_future_event(27, event)
         
-        assert select.select([], [event], [], 17) == []
+        assert select.select([], [event], [], 17) == ([], [], [])
         assert self.clock.timestamp == 17
         
     def test_adding_unwaited_events(self):
@@ -50,7 +50,7 @@ class TestSelectPatcher(object):
         self.events_pool.add_future_event(5, waited_for_event)
         
         assert select.select([waited_for_event], [], [], 7) == \
-            [waited_for_event]
+            ([waited_for_event], [], [])
         
         assert self.clock.timestamp == 5
         
@@ -67,17 +67,17 @@ class TestSelectPatcher(object):
         self.events_pool.add_future_event(3, event4)
         self.events_pool.add_future_event(3, unwaited_event)
         
-        returned_events = set(select.select(
+        returned_events = select.select(
             [event1, event2],
             [event3],
             [event4],
             7
-        ))
+        )
         
-        expected_events = set([event1, event2, event3, event4])
+        expected_events = ([event1, event2], [event3], [event4])
         
-        assert returned_events >= expected_events
-        assert expected_events >= returned_events
+        for returned, expected in zip(returned_events, expected_events):
+            assert set(returned) == set(expected)
         
         assert self.clock.timestamp == 3
 
@@ -86,10 +86,10 @@ class TestSelectPatcher(object):
         
         self.events_pool.add_future_event(3, event)
         
-        assert select.select([], [], [event], 6) == [event]
+        assert select.select([], [], [event], 6) == ([], [], [event])
         assert self.clock.timestamp == 3
         
-        assert select.select([], [], [event], 6) == []
+        assert select.select([], [], [event], 6) == ([], [], [])
         assert self.clock.timestamp == 3 + 6
           
     def test_same_event_multiple_timestamps(self):
@@ -98,10 +98,10 @@ class TestSelectPatcher(object):
         self.events_pool.add_future_event(1, event)
         self.events_pool.add_future_event(2, event)
         
-        assert select.select([], [], [event], 6) == [event]
+        assert select.select([], [], [event], 6) == ([], [], [event])
         assert self.clock.timestamp == 1
         
-        assert select.select([event], [], [event], 6) == [event]
+        assert select.select([event], [], [event], 6) == ([event], [], [event])
         assert self.clock.timestamp == 2
 
     def test_select_with_no_timeout(self):
@@ -109,7 +109,7 @@ class TestSelectPatcher(object):
         
         self.events_pool.add_future_event(3, event)
         
-        assert select.select([event], [], []) == [event]
+        assert select.select([event], [], []) == ([event], [], [])
         assert self.clock.timestamp == 3
 
     def test_select_infinite_wait(self):
@@ -117,3 +117,12 @@ class TestSelectPatcher(object):
         
         with pytest.raises(ValueError):
             select.select([event], [], [])
+            
+    def test_event_returned_in_multiple_lists(self):
+        event = mock.MagicMock()
+        
+        self.events_pool.add_future_event(1, event)
+        
+        assert select.select([event], [event], [event], 6) == \
+            ([event], [event], [event])
+        assert self.clock.timestamp == 1

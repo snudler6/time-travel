@@ -47,7 +47,7 @@ def test_select_no_timeout():
         
         t.events_pool.add_future_event(2, event)
         
-        assert select.select([], [event], []) == [event]
+        assert select.select([], [event], []) == ([], [event], [])
         assert time.time() == 2
         assert datetime.today() == datetime.fromtimestamp(2)
       
@@ -58,7 +58,7 @@ def test_select_with_timeout():
         
         t.events_pool.add_future_event(2, event)
         
-        assert select.select([], [], [event], 6) == [event]
+        assert select.select([], [], [event], 6) == ([], [], [event])
         assert time.time() == 2
         assert datetime.today() == datetime.fromtimestamp(2)
      
@@ -69,6 +69,6 @@ def test_select_timeout_occurring():
         
         t.events_pool.add_future_event(10, event)
         
-        assert select.select([event], [], [], 6) == []
+        assert select.select([event], [], [], 6) == ([], [], [])
         assert time.time() == 6
         assert datetime.today() == datetime.fromtimestamp(6)

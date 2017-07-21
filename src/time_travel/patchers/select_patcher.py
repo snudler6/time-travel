@@ -22,7 +22,11 @@ class SelectPatcher(BasicPatcher):
             spec=select_lib.select)
         
         self.patches = [mock.patch('select.select', self.select)]
-                        
+        
+    @staticmethod
+    def _list_intersection(list1, list2):
+        return list(set(list1).intersection(set(list2)))
+        
     def _mocked_select(self, rlist, wlist, xlist, timeout=None):
         waited_events = set(rlist + wlist + xlist)
         
@@ -54,4 +58,7 @@ class SelectPatcher(BasicPatcher):
         self.events_pool.remove_events(result_timestamp, result_events)
 
         self.clock.timestamp = result_timestamp
-        return result_events
+    
+        return (self._list_intersection(result_events, rlist),
+                self._list_intersection(result_events, wlist),
+                self._list_intersection(result_events, xlist))
