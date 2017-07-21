@@ -11,8 +11,6 @@ class BasicPatcher(object):
         
         self.patches = []
                 
-
-        
     def start(self):
         """Start mocking datetime module."""
         for p in self.patches:

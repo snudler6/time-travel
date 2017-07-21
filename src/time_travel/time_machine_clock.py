@@ -28,4 +28,3 @@ class TimeMachineClock(object):
     def advance_timestamp(self, secs):
         """Advance the clock's timestamp in seconds."""
         self._timestamp += secs
-        

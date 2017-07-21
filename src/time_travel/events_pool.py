@@ -2,10 +2,10 @@
 
 
 class EventsPool(object):
-    """Events set """
-    
+    """Events set for handling patches of event drived libraries."""
     
     def __init__(self):
+        """Initialise an event pool."""
         self.future_events = {}
         
     def add_future_event(self, timestamp, event):
@@ -14,7 +14,6 @@ class EventsPool(object):
         
     def get_events(self):
         """Return all added events sorted by timestamp.
-        
         
         The returned list is:
         [(timestamp1, set(events)), (timestamp2, set(events)), ....]
@@ -32,6 +31,6 @@ class EventsPool(object):
                               if k >= timestamp}
         
     def remove_events(self, timestamp, events):
-        """Remove a list of events from a single timestamp"""
+        """Remove a list of events from a single timestamp."""
         for event in events:
             self.future_events.get(timestamp, set()).remove(event)

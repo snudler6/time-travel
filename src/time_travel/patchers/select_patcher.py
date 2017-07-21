@@ -18,20 +18,19 @@ class SelectPatcher(BasicPatcher):
         super(SelectPatcher, self).__init__(*args, **kwargs)
         
         self.select = mock.Mock(
-            side_effect=self.mocked_select,
+            side_effect=self._mocked_select,
             spec=select_lib.select)
         
         self.patches = [mock.patch('select.select', self.select)]
-
                         
-    def mocked_select(self, rlist, wlist, xlist, timeout=None):
+    def _mocked_select(self, rlist, wlist, xlist, timeout=None):
         waited_events = set(rlist + wlist + xlist)
         
         added_timeout = timeout
-        if timeout == None:
+        if timeout is None:
             added_timeout = float('inf')
         
-        timeout_timestamp = self.clock.timestamp + added_timeout        
+        timeout_timestamp = self.clock.timestamp + added_timeout
         
         result_events = []
         result_timestamp = timeout_timestamp

@@ -45,7 +45,7 @@ class TestSelectPatcher(object):
         assert select.select([waited_for_event], [], [], 7) == \
             [waited_for_event]
         
-        assert self.clock.timestamp== 5
+        assert self.clock.timestamp == 5
         
     def test_multiple_events_for_same_time(self):
         event1 = mock.MagicMock(name='event1')
@@ -72,7 +72,7 @@ class TestSelectPatcher(object):
         assert returned_events >= expected_events
         assert expected_events >= returned_events
         
-        assert self.clock.timestamp == 3    
+        assert self.clock.timestamp == 3
 
     def test_event_not_returned_twice(self):
         event = mock.MagicMock()
