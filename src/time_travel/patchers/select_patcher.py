@@ -38,7 +38,7 @@ class SelectPatcher(BasicPatcher):
     def _get_earliest_events(self, waited_events, events_type, timeout):
         added_timeout = float('inf') if timeout is None else timeout
         
-        timeout_timestamp = self.clock.timestamp + added_timeout
+        timeout_timestamp = self.clock.time + added_timeout
         
         result_events = []
         result_timestamp = timeout_timestamp
@@ -76,7 +76,7 @@ class SelectPatcher(BasicPatcher):
                          write_timestamp,
                          ex_timestamp])
         
-        if timeout is None and timestamp == float('inf'):
+        if timestamp == float('inf'):
             raise ValueError('No relevant future events were set fot infinite '
                              'timout')
         
@@ -94,6 +94,6 @@ class SelectPatcher(BasicPatcher):
                                        ex_events,
                                        SelectPatcher.EventTypes.EXCEPTIONAL)
 
-        self.clock.timestamp = timestamp
+        self.clock.time = timestamp
     
         return (read_events, write_events, ex_events)

@@ -27,4 +27,4 @@ class DatetimePatcher(BasicPatcher):
                         ]
         
     def _now(self):
-        return self.datetime.fromtimestamp(self.clock.timestamp)
+        return self.datetime.fromtimestamp(self.clock.time)

@@ -10,7 +10,7 @@ def test_time_patch_set_time():
     with TimeTravel() as t:
         
         assert time.time() == 0
-        t.clock.timestamp = 3600
+        t.clock.time = 3600
         assert time.time() == 3600
 
 
@@ -21,7 +21,7 @@ def test_sleep_patch_sleep():
         time.sleep(3600)
         assert time.time() == 3600
         
-        t.clock.timestamp = 7200
+        t.clock.time = 7200
         assert time.time() == 7200
         
         
@@ -29,7 +29,7 @@ def test_datetime_patch_set_time():
     with TimeTravel() as t:
         
         assert datetime.today() == datetime.fromtimestamp(0)
-        t.clock.timestamp = 3600
+        t.clock.time = 3600
         assert datetime.today() == datetime.fromtimestamp(3600)
         
 

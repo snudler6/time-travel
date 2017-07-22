@@ -27,18 +27,22 @@ class EventsPool(object):
         [(timestamp1, set(events)), (timestamp2, set(events)), ....]
         where the timestamps are sorted.
         """
-        def filtered_set(events_set):
+        def _filtered_set(events_set):
+            """Return evevnts subset matching to the predicate.
+            
+            Also remove the event type from the event tuple.
+            """
             return set([event for event, event_type in
                         events_set if predicate(event_type)])
         
         predicate = (lambda etype: True) if predicate is None else predicate
         
-        filterd_events = [(timestamp, filtered_set(events_set)) for
+        filterd_events = [(timestamp, _filtered_set(events_set)) for
                           timestamp, events_set in self.future_events.items()]
         
         return sorted(filterd_events, key=lambda x: x[0])
     
-    def set_timestamp(self, timestamp):
+    def set_time(self, timestamp):
         """Remove all events before the given timestamp.
         
         - timestamp: time in seconds since the epoch.
@@ -53,5 +57,7 @@ class EventsPool(object):
     def remove_events(self, timestamp, events, event_type=None):
         """Remove a list of events from a single timestamp."""
         for event in events:
-            self.future_events.get(timestamp, set()).remove(
-                (event, event_type))
+            self.future_events[timestamp].remove((event, event_type))
+        
+        if events and not self.future_events[timestamp]:
+            self.future_events.pop(timestamp)

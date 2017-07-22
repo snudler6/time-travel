@@ -4,30 +4,26 @@
 class TimeMachineClock(object):
     """Unifing class for clock types."""
     
-    def __init__(self, start_timestamp=0.0, clock_listeners=None):
+    def __init__(self, start_time=0.0, clock_listeners=None):
         """Initialise a unifing clock."""
-        self._timestamp = start_timestamp
+        self._time = start_time
         
         self._clock_listeners = clock_listeners
         if clock_listeners is None:
             self._clock_listeners = []
         
     @property
-    def timestamp(self):
-        """Get the clock timestamp in seconds since the epoch."""
-        return self._timestamp
+    def time(self):
+        """Get the clock time in seconds since the epoch."""
+        return self._time
     
-    @timestamp.setter
-    def timestamp(self, timestamp):
-        """Set the clock timestamp.
+    @time.setter
+    def time(self, time):
+        """Set the clock time.
         
-        timestamp - is time in seconds since the epoch.
+        time - is time in seconds since the epoch.
         """
-        self._timestamp = float(timestamp)
+        self._time = float(time)
         
         for listener in self._clock_listeners:
-            listener.set_timestamp(self._timestamp)
-    
-    def advance_timestamp(self, secs):
-        """Advance the clock's timestamp in seconds."""
-        self._timestamp += secs
+            listener.set_time(self._time)
