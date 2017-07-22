@@ -21,6 +21,9 @@ class TimeTravel(object):
       events_pool object corresponding to the events_pool interface.
     """
     
+    class EventsType(object):
+        """Empty class to register events types on."""
+    
     def __init__(self, start_time=0):
         """Create the patch.
         
@@ -32,6 +35,11 @@ class TimeTravel(object):
         patches = [DatetimePatcher, TimePatcher, SelectPatcher]
         self.patches = [patcher(self.clock, self.events_pool) for patcher in
                         patches]
+        
+        self.events_types = TimeTravel.EventsType()
+        
+        for patcher in self.patches:
+            patcher.register_events_types(self.events_types)
    
     def __enter__(self):
         for patcher in self.patches:

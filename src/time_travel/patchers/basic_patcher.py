@@ -10,6 +10,11 @@ class BasicPatcher(object):
         self.events_pool = events_pool
         
         self.patches = []
+        
+    @classmethod
+    def register_events_types(cls, main_events_types):
+        """Register the events header and types."""
+        pass
                 
     def start(self):
         """Start mocking datetime module."""
