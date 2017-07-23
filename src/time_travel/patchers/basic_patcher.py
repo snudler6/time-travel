@@ -12,9 +12,14 @@ class BasicPatcher(object):
         self.patches = []
         
     @classmethod
-    def register_events_types(cls, main_events_types):
-        """Register the events header and types."""
-        pass
+    def get_events_namespace(cls):
+        """Return the namespace of the patcher's events."""
+        return None
+    
+    @classmethod
+    def get_events_types(cls):
+        """Return Enum of the patcher's events types."""
+        return None
                 
     def start(self):
         """Start mocking datetime module."""

@@ -14,6 +14,7 @@ class SelectPatcher(BasicPatcher):
         - select.select
     """
     
+    EVENTS_NAMESPACE = 'select'
     EventTypes = Enum('select', 'READ WRITE EXCEPTIONAL')
     
     def __init__(self, *args, **kwargs):
@@ -27,9 +28,14 @@ class SelectPatcher(BasicPatcher):
         self.patches = [mock.patch('select.select', self.select)]
         
     @classmethod
-    def register_events_types(cls, main_events_types):
-        """Register select events types."""
-        setattr(main_events_types, 'select', cls.EventTypes) 
+    def get_events_namespace(cls):
+        """Return the namespace of the select events."""
+        return cls.EVENTS_NAMESPACE
+    
+    @classmethod
+    def get_events_types(cls):
+        """Return Enum of select events types."""
+        return cls.EventTypes 
         
     @staticmethod
     def _list_intersection(list1, list2):

@@ -39,7 +39,10 @@ class TimeTravel(object):
         self.events_types = TimeTravel.EventsType()
         
         for patcher in self.patches:
-            patcher.register_events_types(self.events_types)
+            if patcher.get_events_namespace() is not None:
+                setattr(self.events_types,
+                        patcher.get_events_namespace(),
+                        patcher.get_events_types())
    
     def __enter__(self):
         for patcher in self.patches:
