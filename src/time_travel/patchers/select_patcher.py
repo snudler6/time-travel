@@ -67,15 +67,15 @@ class SelectPatcher(BasicPatcher):
     def _mocked_select(self, rlist, wlist, xlist, timeout=None):
         read_timestamp, read_events = self._get_earliest_events(
             rlist,
-            SelectPatcher.EventTypes.READ,
+            self.EventTypes.READ,
             timeout)
         write_timestamp, write_events = self._get_earliest_events(
             wlist,
-            SelectPatcher.EventTypes.WRITE,
+            self.EventTypes.WRITE,
             timeout)
         ex_timestamp, ex_events = self._get_earliest_events(
             xlist,
-            SelectPatcher.EventTypes.EXCEPTIONAL,
+            self.EventTypes.EXCEPTIONAL,
             timeout)
         
         timestamp = min([read_timestamp,
@@ -92,13 +92,13 @@ class SelectPatcher(BasicPatcher):
         
         self.events_pool.remove_events(timestamp,
                                        read_events,
-                                       SelectPatcher.EventTypes.READ)
+                                       self.EventTypes.READ)
         self.events_pool.remove_events(timestamp,
                                        write_events,
-                                       SelectPatcher.EventTypes.WRITE)
+                                       self.EventTypes.WRITE)
         self.events_pool.remove_events(timestamp,
                                        ex_events,
-                                       SelectPatcher.EventTypes.EXCEPTIONAL)
+                                       self.EventTypes.EXCEPTIONAL)
 
         self.clock.time = timestamp
     
