@@ -8,14 +8,17 @@ class EventsPool(object):
         """Initialise an event pool."""
         self.future_events = {}
         
-    def add_future_event(self, timestamp,
+    def add_future_event(self,
+                         timestamp,
                          event_descriptor,
                          event_predicate=None):
         """Add an event to a given timestamp.
         
         - timestamp: time in seconds since the epoch.
-        - event: any object (preferebly mock object) identifying the object
-                 that a patched event waiting function will be wait on. 
+        - event_descriptor: any object (preferebly mock object) identifying the
+                            object that a patched event waiting function will
+                            be wait on.
+        - event_predicate: any object the relevant patcher will filter by.
         """
         self.future_events.setdefault(timestamp, set()).add(
             (event_descriptor, event_predicate))
@@ -23,10 +26,16 @@ class EventsPool(object):
     def get_events(self, predicate=None):
         """Return all added events sorted by timestamp.
         
+        - predicate: A condition to filter the events by. The condition will
+                     be activated on the event_predicate passed to
+                     `add_future_event`
+                     
         The returned list is:
         [(timestamp1, set(events)), (timestamp2, set(events)), ....]
         where the timestamps are sorted.
         """
+        predicate = (lambda etype: True) if predicate is None else predicate
+        
         def _filtered_set(events_set):
             """Return evevnts subset matching to the predicate.
             
@@ -34,8 +43,6 @@ class EventsPool(object):
             """
             return set([event for event, event_type in
                         events_set if predicate(event_type)])
-        
-        predicate = (lambda etype: True) if predicate is None else predicate
         
         filterd_events = [(timestamp, _filtered_set(events_set)) for
                           timestamp, events_set in self.future_events.items()]
