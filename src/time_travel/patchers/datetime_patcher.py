@@ -13,10 +13,9 @@ class DatetimePatcher(BasicPatcher):
         - datetime.today
     """
     
-    def __init__(self, clock):
+    def __init__(self, *args, **kwargs):
         """Create the patch."""
-        super(DatetimePatcher, self).__init__(clock)
-        self.clock = clock
+        super(DatetimePatcher, self).__init__(*args, **kwargs)
         
         self.datetime = mock.Mock(wraps=datetime_lib.datetime)
         self.datetime.mock_add_spec(
@@ -28,4 +27,4 @@ class DatetimePatcher(BasicPatcher):
                         ]
         
     def _now(self):
-        return self.datetime.fromtimestamp(self.clock.timestamp)
+        return self.datetime.fromtimestamp(self.clock.time)

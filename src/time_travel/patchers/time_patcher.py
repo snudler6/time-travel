@@ -13,18 +13,26 @@ class TimePatcher(BasicPatcher):
         - sleep
     """
     
-    def __init__(self, clock):
+    def __init__(self, *args, **kwargs):
         """Create the patch."""
-        super(TimePatcher, self).__init__(clock)
+        super(TimePatcher, self).__init__(*args, **kwargs)
         
         self.patches.append(
             mock.patch('time.time', side_effect=self._get_timestamp))
+        
         self.patches.append(
-            mock.patch('time.sleep', side_effect=self.clock.advance_timestamp))
+            mock.patch('time.sleep', side_effect=self._advance_time_stamp))
     
     def _get_timestamp(self):
         """Return the clock timestamp.
         
-        Used for mocks side_effect, not to pre-evaluate the timestamp property.
+        Used for mocks side_effect, not to pre-evaluate the time property.
         """
-        return self.clock.timestamp
+        return self.clock.time
+    
+    def _advance_time_stamp(self, seconds):
+        """Return the clock time.
+        
+        Used for the side_effect of sleep.
+        """
+        self.clock.time += seconds

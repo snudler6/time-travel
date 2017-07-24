@@ -1,65 +1,49 @@
 """Mocking interface for python time libraries."""
 
-
-# from pytest import set_trace
-# set_trace()
-import sys
-print sys.path
 from patchers.datetime_patcher import DatetimePatcher
 from patchers.time_patcher import TimePatcher
+from patchers.select_patcher import SelectPatcher
 
+from time_machine_clock import TimeMachineClock
+from events_pool import EventsPool
 
-class TimeMachineClock(object):
-    """Unifing class for clock types."""
-    
-    def __init__(self, start_timestamp=0.0):
-        """Initialize a unifing clock."""
-        self._timestamp = start_timestamp
-        
-    @property
-    def timestamp(self):
-        """Get the clock timestamp in seconds since the epoch."""
-        return self._timestamp
-    
-    @timestamp.setter
-    def timestamp(self, timestatmp):
-        """Set the clock timestamp.
-        
-        @timestamp - is time in seconds since the epoch.
-        """
-        self._timestamp = float(timestatmp)
-    
-    def advance_timestamp(self, secs):
-        """Advance the clock's timestamp in seconds."""
-        self._timestamp += secs
-        
+import sys
+print sys.path
+
 
 class TimeTravel(object):
-    """Context-manager patching time libraries."""
+    """Context-manager patching time libraries.
+    
+    - For setting timestamps and advancing the time, use the clock object
+      corresponiding to the time_machine_clock interface
+      
+    - For setting events for event based libraies (i.e. select) use the
+      events_pool object corresponding to the events_pool interface.
+    """
+    
+    class EventsType(object):
+        """Empty class to register events types on."""
     
     def __init__(self, start_time=0):
         """Create the patch.
         
         @start_time is time in seconds since the epoch.
         """
-        self.clock = TimeMachineClock(start_time)
+        self.events_pool = EventsPool()
+        self.clock = TimeMachineClock(start_time, [self.events_pool])
         
-        self.patches = [
-            DatetimePatcher(self.clock),
-            TimePatcher(self.clock),
-        ]
-
-    def set_time(self, timestamp):
-        """Set the time returned by now functions.
+        patches = [DatetimePatcher, TimePatcher, SelectPatcher]
+        self.patches = [patcher(self.clock, self.events_pool) for patcher in
+                        patches]
         
-        @timestamp - is time in seconds since the epoch.
-        """
-        self.clock.timestamp = timestamp
+        self.events_types = TimeTravel.EventsType()
         
-    def get_time(self):
-        """Return a datetime object of the currently set time."""
-        return self.clock.timestamp
-    
+        for patcher in self.patches:
+            if patcher.get_events_namespace() is not None:
+                setattr(self.events_types,
+                        patcher.get_events_namespace(),
+                        patcher.get_events_types())
+   
     def __enter__(self):
         for patcher in self.patches:
             patcher.start()

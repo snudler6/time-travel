@@ -11,7 +11,7 @@ def test_datetime_patch():
     
     assert datetime.datetime.today() == datetime.datetime.fromtimestamp(0)
     
-    clock.timestamp = 3600
+    clock.time = 3600
     assert datetime.datetime.today() == datetime.datetime.fromtimestamp(3600)
     patcher.stop()
     

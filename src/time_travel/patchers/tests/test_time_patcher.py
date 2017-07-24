@@ -11,7 +11,7 @@ def test_time_patch():
     patcher.start()
     
     assert time.time() == 0
-    clock.timestamp = 3600
+    clock.time = 3600
     assert time.time() == 3600
     
     patcher.stop()
@@ -27,7 +27,7 @@ def test_sleep_patch():
     time.sleep(3600)
     assert time.time() == 3600
     
-    clock.timestamp = 7200
+    clock.time = 7200
     assert time.time() == 7200
 
     patcher.stop()
