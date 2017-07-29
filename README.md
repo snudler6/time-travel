@@ -47,6 +47,6 @@ with TimeTravel() as t:
 ## List of currently patched modules and functions
 
 - time.time
-- time.time
+- time.sleep
 - datetime.datetime.today
 - select.select
