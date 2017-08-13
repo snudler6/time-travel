@@ -1,8 +1,6 @@
 """Mocking interface for python time libraries."""
 
-from patchers.datetime_patcher import DatetimePatcher
-from patchers.time_patcher import TimePatcher
-from patchers.select_patcher import SelectPatcher
+import pkg_resources
 
 from time_machine_clock import TimeMachineClock
 from events_pool import EventsPool
@@ -31,10 +29,14 @@ class TimeTravel(object):
         """
         self.events_pool = EventsPool()
         self.clock = TimeMachineClock(start_time, [self.events_pool])
-        
-        patches = [DatetimePatcher, TimePatcher, SelectPatcher]
-        self.patches = [patcher(self.clock, self.events_pool) for patcher in
-                        patches]
+
+        patches = [] 
+        for patcher in pkg_resources.iter_entry_points(
+                group='time_travel.patchers'):
+            patches.append(patcher.load())
+
+        self.patches = [patcher(self.clock, self.events_pool)
+                        for patcher in patches]
         
         self.events_types = TimeTravel.EventsType()
         
