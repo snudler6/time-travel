@@ -13,7 +13,7 @@ in a single line.
 
 ### Examples
 
-#### Skip timouts
+#### Skip timeouts
 
 Tests are determenistic and take no time with time travel.
 
@@ -50,3 +50,36 @@ with TimeTravel() as t:
 - time.sleep
 - datetime.datetime.today
 - select.select
+
+### Add your own patches to time-travel
+
+time-travel uses python "entry points" to add external patches to it.
+
+#### Example
+my_new_patcher.py:
+```python
+from time_travel.patchers.basic_patcher import BasicPatcher
+
+class MyNewPatcher(BasicPatcher):
+    def __init__(self, *args, **kwargs):
+        pass
+```
+
+To add the new patcher automatically to time-travel, only add the new class to the "time_travel.patchers" entry point in your setup.py:
+```python
+from setuptools import setup
+
+setup(
+    name=...
+    .
+    .
+    .
+    entry_points={
+        'time_travel.patchers' : [
+            'my_new_patcher = my_new_patcher:MyNewPatcher',
+        ],
+    }
+)
+```
+
+
