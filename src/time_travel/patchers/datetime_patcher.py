@@ -1,6 +1,6 @@
 """A patch to the datetime module."""
 
-from basic_patcher import BasicPatcher
+from .basic_patcher import BasicPatcher
 
 import datetime as datetime_lib
 import mock

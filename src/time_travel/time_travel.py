@@ -2,11 +2,8 @@
 
 import pkg_resources
 
-from time_machine_clock import TimeMachineClock
-from events_pool import EventsPool
-
-import sys
-print sys.path
+from .time_machine_clock import TimeMachineClock
+from .events_pool import EventsPool
 
 
 class TimeTravel(object):
