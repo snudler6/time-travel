@@ -43,6 +43,19 @@ with TimeTravel() as t:
     assert time.time() == 2
 ```
 
+Or using ``poll``:
+
+```python
+with TimeTravel() as t:
+    fd = mock.MagicMock()
+    t.events_pool.add_future_event(2, fd, select.POLLIN)
+
+    poll = select.poll()
+    poll.register(fd, select.POLLIN | select.POLLOUT)
+
+    assert poll.poll() == [(fd, select.POLLIN)]
+    assert time.time() == 2
+```
 
 ## List of currently patched modules and functions
 
