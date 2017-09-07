@@ -12,4 +12,11 @@ setup(
     url='https://github.com/snudler6/time-travel',
     packages=('time_travel',),
     package_dir={'': 'src'},
+    entry_points={
+        'time_travel.patchers': [
+            'datetime_patcher = src.time_travel.patchers.datetime_patcher:DatetimePatcher',
+            'select_patcher = src.time_travel.patchers.select_patcher:SelectPatcher',
+            'time_patcher = src.time_travel.patchers.time_patcher:TimePatcher',
+        ],
+    }
 )

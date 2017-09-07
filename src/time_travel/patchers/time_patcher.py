@@ -1,6 +1,6 @@
 """A patch to the time module."""
 
-from basic_patcher import BasicPatcher
+from .basic_patcher import BasicPatcher
 
 import mock
 
