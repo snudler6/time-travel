@@ -1,4 +1,4 @@
-"""A patch to the datetime module."""
+"""A patch to the select.select function."""
 
 from .basic_patcher import BasicPatcher
 
@@ -8,11 +8,7 @@ import mock
 
 
 class SelectPatcher(BasicPatcher):
-    """Patcher for select module.
-    
-    patching:
-        - select.select
-    """
+    """Patcher for select.select."""
     
     EVENTS_NAMESPACE = 'select'
     EventTypes = Enum('select', ['READ', 'WRITE', 'EXCEPTIONAL'])
@@ -85,7 +81,7 @@ class SelectPatcher(BasicPatcher):
                          ex_timestamp])
         
         if timestamp == float('inf'):
-            raise ValueError('No relevant future events were set fot infinite '
+            raise ValueError('No relevant future events were set for infinite '
                              'timout')
         
         read_fds = [] if timestamp < read_timestamp else read_fds

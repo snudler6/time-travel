@@ -95,9 +95,9 @@ class TestPollPatcher(object):
         self.poll.register(event3, select.POLLIN)
         self.poll.register(far_event, select.POLLIN)
 
-        assert self.poll.poll() == [(event1, select.POLLIN),
-                                    (event2, select.POLLIN),
-                                    (event3, select.POLLIN)]
+        assert set(self.poll.poll()) == set([(event1, select.POLLIN),
+                                             (event2, select.POLLIN),
+                                             (event3, select.POLLIN)])
         assert self.clock.time == 3
 
     def test_same_object_multiple_events(self):
@@ -165,3 +165,20 @@ class TestPollPatcher(object):
 
         assert self.poll.poll(sec2msec(10)) == []
         assert self.clock.time == 1 + 10
+
+    def test_modify_event(self):
+        event = mock.MagicMock()
+
+        self.events_pool.add_future_event(1, event, select.POLLIN)
+        self.events_pool.add_future_event(5, event, select.POLLIN)
+        self.events_pool.add_future_event(10, event, select.POLLOUT)
+
+        self.poll.register(event, select.POLLIN)
+
+        assert self.poll.poll() == [(event, select.POLLIN)]
+        assert self.clock.time == 1
+
+        self.poll.modify(event, select.POLLOUT)
+
+        assert self.poll.poll() == [(event, select.POLLOUT)]
+        assert self.clock.time == 10

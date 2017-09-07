@@ -68,23 +68,7 @@ class EventsPool(object):
         
     def remove_fd(self, timestamp, fd, event):
         """Remove a single event for a single fd from a single timestamp."""
-        try:
-            print "ENTERING"
-            self.future_events[timestamp][fd].remove(event)
-            print "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-            print repr(timestamp)
-            print repr(fd)
-            print repr(event)
-            print self.future_events
-            print "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-        except Exception:
-            print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-            print repr(timestamp)
-            print repr(fd)
-            print repr(event)
-            print self.future_events
-            print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-            raise
+        self.future_events[timestamp][fd].remove(event)
 
         if not self.future_events[timestamp][fd]:
             self.future_events[timestamp].pop(fd)
