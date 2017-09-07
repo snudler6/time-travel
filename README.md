@@ -49,6 +49,8 @@ with TimeTravel() as t:
 - time.time
 - time.sleep
 - datetime.datetime.today
+- datetime.datetime.now
+- datetime.datetime.utcnow
 - select.select
 
 ### Add your own patches to time-travel

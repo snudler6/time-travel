@@ -31,14 +31,14 @@ def test_datetime_patch_set_time():
         assert datetime.today() == datetime.fromtimestamp(0)
         t.clock.time = 3600
         assert datetime.today() == datetime.fromtimestamp(3600)
-        
+                
 
 def test_sleep_changing_today():
     with TimeTravel():
         assert datetime.today() == datetime.fromtimestamp(0)
         
         time.sleep(3600)
-        assert datetime.today() == datetime.fromtimestamp(3600)
+        assert datetime.now() == datetime.fromtimestamp(3600)
 
 
 def test_select_no_timeout():
