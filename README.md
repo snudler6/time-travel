@@ -50,6 +50,7 @@ with TimeTravel() as t:
 - time.sleep
 - datetime.datetime.today
 - select.select
+- select.poll
 
 ### Add your own patches to time-travel
 
