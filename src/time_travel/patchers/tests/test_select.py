@@ -37,7 +37,9 @@ class TestSelectPatcher(object):
     
     def test_future_event_after_timeout(self):
         event = mock.MagicMock()
-        self.events_pool.add_future_event(27, event)
+        self.events_pool.add_future_event(27,
+                                          event,
+                                          SelectPatcher.EventTypes.READ)
         
         assert select.select([], [event], [], 17) == ([], [], [])
         assert self.clock.time == 17

@@ -15,7 +15,7 @@ class SelectPatcher(BasicPatcher):
     """
     
     EVENTS_NAMESPACE = 'select'
-    EventTypes = Enum('select', 'READ WRITE EXCEPTIONAL')
+    EventTypes = Enum('select', ['READ', 'WRITE', 'EXCEPTIONAL'])
     
     def __init__(self, *args, **kwargs):
         """Create the patch."""
@@ -41,43 +41,45 @@ class SelectPatcher(BasicPatcher):
     def _list_intersection(list1, list2):
         return list(set(list1).intersection(set(list2)))
     
-    def _get_earliest_events(self, waited_events, events_type, timeout):
+    def _get_earliest_events(self, waited_fds, event, timeout):
         added_timeout = float('inf') if timeout is None else timeout
         
         timeout_timestamp = self.clock.time + added_timeout
         
         result_events = []
         result_timestamp = timeout_timestamp
-        
-        for timestamp, events in self.events_pool.get_events(
-                lambda etype: etype == events_type):
+
+        def _is_relevant_fd_event(fd, evt):
+            return fd in waited_fds and evt == event
+
+        # fd_events is a list of [(fd, set(events)), ...].
+        for timestamp, fd_events in self.events_pool.get_events(
+                _is_relevant_fd_event):
             if timestamp > timeout_timestamp:
                 # No event before the timeout
                 break
             
-            triggering_events = set(waited_events).intersection(events) 
-            
-            if triggering_events:
-                result_events = list(triggering_events)
+            if fd_events:
+                result_events = [fd for fd, _ in fd_events]
                 result_timestamp = timestamp
                 break
             
         return result_timestamp, result_events
     
     def _mocked_select(self, rlist, wlist, xlist, timeout=None):
-        read_timestamp, read_events = self._get_earliest_events(
+        read_timestamp, read_fds = self._get_earliest_events(
             rlist,
             self.EventTypes.READ,
             timeout)
-        write_timestamp, write_events = self._get_earliest_events(
+        write_timestamp, write_fds = self._get_earliest_events(
             wlist,
             self.EventTypes.WRITE,
             timeout)
-        ex_timestamp, ex_events = self._get_earliest_events(
+        ex_timestamp, ex_fds = self._get_earliest_events(
             xlist,
             self.EventTypes.EXCEPTIONAL,
             timeout)
-        
+
         timestamp = min([read_timestamp,
                          write_timestamp,
                          ex_timestamp])
@@ -86,20 +88,20 @@ class SelectPatcher(BasicPatcher):
             raise ValueError('No relevant future events were set fot infinite '
                              'timout')
         
-        read_events = [] if timestamp < read_timestamp else read_events
-        write_events = [] if timestamp < write_timestamp else write_events
-        ex_events = [] if timestamp < ex_timestamp else ex_events
-        
-        self.events_pool.remove_events(timestamp,
-                                       read_events,
-                                       self.EventTypes.READ)
-        self.events_pool.remove_events(timestamp,
-                                       write_events,
-                                       self.EventTypes.WRITE)
-        self.events_pool.remove_events(timestamp,
-                                       ex_events,
-                                       self.EventTypes.EXCEPTIONAL)
+        read_fds = [] if timestamp < read_timestamp else read_fds
+        write_fds = [] if timestamp < write_timestamp else write_fds
+        ex_fds = [] if timestamp < ex_timestamp else ex_fds
+
+        self.events_pool.remove_fds(timestamp,
+                                    [(fd, self.EventTypes.READ)
+                                     for fd in read_fds])
+        self.events_pool.remove_fds(timestamp,
+                                    [(fd, self.EventTypes.WRITE)
+                                     for fd in write_fds])
+        self.events_pool.remove_fds(timestamp,
+                                    [(fd, self.EventTypes.EXCEPTIONAL)
+                                     for fd in ex_fds])
 
         self.clock.time = timestamp
     
-        return (read_events, write_events, ex_events)
+        return read_fds, write_fds, ex_fds
