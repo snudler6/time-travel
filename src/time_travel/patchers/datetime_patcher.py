@@ -54,6 +54,8 @@ class DatetimePatcher(BasicPatcher):
         self.patches = [mock.patch.object(datetime,
                                           'datetime',
                                           MockedDatetime),
+                        mock.patch('datetime.datetime',
+                                   MockedDatetime),
                         ]
     
     def _now(self):

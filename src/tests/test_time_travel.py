@@ -1,6 +1,7 @@
 from time_travel import TimeTravel
 
 import time
+import datetime as dtl
 from datetime import datetime
 import select
 import mock
@@ -35,6 +36,8 @@ def test_datetime_patch_set_time():
 
 def test_sleep_changing_today():
     with TimeTravel():
+        import pdb
+        pdb.set_trace()
         assert datetime.today() == datetime.fromtimestamp(0)
         
         time.sleep(3600)
