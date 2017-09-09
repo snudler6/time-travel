@@ -74,3 +74,15 @@ def test_select_timeout_occurring():
         assert select.select([event], [], [], 6) == ([], [], [])
         assert time.time() == 6
         assert datetime.today() == datetime.fromtimestamp(6)
+
+
+def test_poll():
+    with TimeTravel() as t:
+        fd = mock.MagicMock()
+        t.events_pool.add_future_event(2, fd, select.POLLIN)
+
+        poll = select.poll()
+        poll.register(fd, select.POLLIN | select.POLLOUT)
+
+        assert poll.poll() == [(fd, select.POLLIN)]
+        assert time.time() == 2

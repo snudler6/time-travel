@@ -41,26 +41,18 @@ class SelectPatcher(BasicPatcher):
         added_timeout = float('inf') if timeout is None else timeout
         
         timeout_timestamp = self.clock.time + added_timeout
-        
-        result_events = []
-        result_timestamp = timeout_timestamp
 
         def _is_relevant_fd_event(fd, evt):
             return fd in waited_fds and evt == event
 
         # fd_events is a list of [(fd, set(events)), ...].
-        for timestamp, fd_events in self.events_pool.get_events(
-                _is_relevant_fd_event):
-            if timestamp > timeout_timestamp:
-                # No event before the timeout
-                break
-            
-            if fd_events:
-                result_events = [fd for fd, _ in fd_events]
-                result_timestamp = timestamp
-                break
-            
-        return result_timestamp, result_events
+        ts, fd_events = self.events_pool.get_next_event(
+            _is_relevant_fd_event)
+
+        if ts is None or ts > timeout_timestamp:
+            return timeout_timestamp, []
+        else:
+            return ts, [fd for fd, _ in fd_events]
     
     def _mocked_select(self, rlist, wlist, xlist, timeout=None):
         read_timestamp, read_fds = self._get_earliest_events(
@@ -88,15 +80,15 @@ class SelectPatcher(BasicPatcher):
         write_fds = [] if timestamp < write_timestamp else write_fds
         ex_fds = [] if timestamp < ex_timestamp else ex_fds
 
-        self.events_pool.remove_fds(timestamp,
-                                    [(fd, self.EventTypes.READ)
-                                     for fd in read_fds])
-        self.events_pool.remove_fds(timestamp,
-                                    [(fd, self.EventTypes.WRITE)
-                                     for fd in write_fds])
-        self.events_pool.remove_fds(timestamp,
-                                    [(fd, self.EventTypes.EXCEPTIONAL)
-                                     for fd in ex_fds])
+        self.events_pool.remove_events_from_fds(
+            timestamp,
+            [(fd, self.EventTypes.READ) for fd in read_fds])
+        self.events_pool.remove_events_from_fds(
+            timestamp,
+            [(fd, self.EventTypes.WRITE) for fd in write_fds])
+        self.events_pool.remove_events_from_fds(
+            timestamp,
+            [(fd, self.EventTypes.EXCEPTIONAL) for fd in ex_fds])
 
         self.clock.time = timestamp
     

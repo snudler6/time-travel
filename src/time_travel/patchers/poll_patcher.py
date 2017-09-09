@@ -51,7 +51,7 @@ class MockPollObject(object):
 
         for fd, events in fd_events:
             for event in events:
-                self.events_pool.remove_fd(timestamp, fd, event)
+                self.events_pool.remove_event_from_fd(timestamp, fd, event)
 
         self.clock.time = timestamp
 
@@ -72,25 +72,16 @@ class MockPollObject(object):
 
         timeout_timestamp = self.clock.time + timeout
 
-        result_events = []
-        result_timestamp = timeout_timestamp
-
         def _is_relevant_fd_event(fd, evt):
             return fd in self.poll_events and self.poll_events[fd] & evt
 
         # fd_events is a list of [(fd, set(events)), ...].
-        for timestamp, fd_events in self.events_pool.get_events(
-                _is_relevant_fd_event):
-            if timestamp > timeout_timestamp:
-                # No event before the timeout
-                break
+        ts, fd_events = self.events_pool.get_next_event(_is_relevant_fd_event)
 
-            if fd_events:
-                result_events = fd_events
-                result_timestamp = timestamp
-                break
-
-        return result_timestamp, result_events
+        if ts is None or ts > timeout_timestamp:
+            return timeout_timestamp, []
+        else:
+            return ts, fd_events
 
 
 class PollPatcher(BasicPatcher):
