@@ -25,7 +25,7 @@ class DatetimePatcher(BasicPatcher):
         def __instancecheck__(mcs, obj):
             return isinstance(obj, real_datetime_class)
 
-    class BaseMockedDatetime(real_datetime_class, mock.Mock):
+    class BaseMockedDatetime(real_datetime_class):
         """Mock class to cover datetime class."""
         
         @classmethod
