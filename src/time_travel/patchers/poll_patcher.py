@@ -50,8 +50,9 @@ class MockPollObject(object):
                              'timout')
 
         for fd, events in fd_events:
-            for event in events:
-                self.events_pool.remove_event_from_fd(timestamp, fd, event)
+            self.events_pool.remove_events_from_fds(
+                timestamp,
+                [(fd, event) for event in events])
 
         self.clock.time = timestamp
 

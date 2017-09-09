@@ -4,10 +4,10 @@
 class EventsPool(object):
     """Events set for handling patches of event derived libraries.
 
-    The pool contains a dictionary that for each timestamp (since epoc) holds
+    The pool contains a dictionary that for each second since epoc holds
     file descriptors and the events that will occur for them.
     The dictionary's format is as follows:
-      self.future_events[timestamp] = {fd: set(event), fd: set(event), ...}
+      self.future_events = {timestamp: {fd: set(event, ...), ...}}
     """
 
     def __init__(self):
