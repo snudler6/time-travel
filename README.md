@@ -48,7 +48,7 @@ with TimeTravel() as t:
 
 - time.time
 - time.sleep
-- datetime.datetime.today
+- datetime.datetime.today # Must import the module
 - datetime.datetime.now
 - datetime.datetime.utcnow
 - select.select
