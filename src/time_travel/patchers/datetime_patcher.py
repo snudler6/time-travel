@@ -14,6 +14,8 @@ class DatetimePatcher(BasicPatcher):
     
     patching:
         - datetime.today
+        - datetime.now
+        - datetime.utcnow
     """
     
     class DatetimeSubclassMeta(type):
@@ -23,7 +25,7 @@ class DatetimePatcher(BasicPatcher):
         def __instancecheck__(mcs, obj):
             return isinstance(obj, real_datetime_class)
 
-    class BaseMockedDatetime(real_datetime_class):
+    class BaseMockedDatetime(real_datetime_class, mock.Mock):
         """Mock class to cover datetime class."""
         
         @classmethod
@@ -47,12 +49,14 @@ class DatetimePatcher(BasicPatcher):
         
         MockedDatetime = self.DatetimeSubclassMeta('datetime',
                                                    (self.BaseMockedDatetime,),
-                                                   {})
-        MockedDatetime._now = self._now
-        
-        self.patches = [mock.patch('datetime.datetime',
-                                   MockedDatetime),
-                        ]
+                                                   {'_now': self._now})
+
+        patcher = mock.patch('datetime.datetime',
+                             MockedDatetime)
+               
+        self.patches = [
+            patcher,
+        ]
     
     def _now(self):
         return real_datetime_class.fromtimestamp(self.clock.time)

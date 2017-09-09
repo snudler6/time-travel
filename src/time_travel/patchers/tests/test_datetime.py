@@ -2,6 +2,7 @@ from time_travel.patchers.datetime_patcher import DatetimePatcher
 from time_travel.time_travel import TimeMachineClock
 
 import datetime
+from datetime import datetime as orig_datetime_class
 
 
 class TestDatetimePatcher(object):
@@ -9,7 +10,7 @@ class TestDatetimePatcher(object):
     def setup_method(self, method):
         """Start a datetime patcher."""
         self.clock = TimeMachineClock()
-        self.patcher = DatetimePatcher(self.clock)
+        self.patcher = DatetimePatcher(clock=self.clock)
         self.patcher.start()
         
     def teardown_method(self, method):
@@ -38,5 +39,5 @@ class TestDatetimePatcher(object):
             datetime.datetime.fromtimestamp(3600)
             
     def test_isinstance_works(self):
-        from datetime import datetime
-        assert isinstance(datetime.today(), datetime)
+        assert isinstance(datetime.datetime.today(),
+                          orig_datetime_class)
