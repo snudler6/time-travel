@@ -1,9 +1,10 @@
 from time_travel import TimeTravel
 
 import time
-import datetime
+from datetime import datetime
 import select
 import mock
+from datetime import datetime as datetime_cls
 
 
 def test_time_patch_set_time():
@@ -28,17 +29,25 @@ def test_sleep_patch_sleep():
 def test_datetime_patch_set_time():
     with TimeTravel() as t:
         
-        assert datetime.datetime.today() == datetime.datetime.fromtimestamp(0)
+        assert datetime.today() == datetime.fromtimestamp(0)
         t.clock.time = 3600
-        assert datetime.datetime.today() ==\
-            datetime.datetime.fromtimestamp(3600)
+        assert datetime.today() ==\
+            datetime.fromtimestamp(3600)
+            
+            
+def test_sub_module_patching():
+    with TimeTravel() as t:
+        
+        assert datetime_cls.today() == datetime_cls.fromtimestamp(0)
+        t.clock.time = 3600
+        assert datetime_cls.today() == datetime_cls.fromtimestamp(3600)
                 
 
-def test_sleep_changing_today():
+def test_sleep_changing_datetime_now():
     with TimeTravel():
-        assert datetime.datetime.today() == datetime.datetime.fromtimestamp(0)
+        assert datetime.today() == datetime.fromtimestamp(0)
         time.sleep(3600)
-        assert datetime.datetime.now() == datetime.datetime.fromtimestamp(3600)
+        assert datetime.now() == datetime.fromtimestamp(3600)
 
 
 def test_select_no_timeout():
@@ -49,7 +58,7 @@ def test_select_no_timeout():
         
         assert select.select([], [event], []) == ([], [event], [])
         assert time.time() == 2
-        assert datetime.datetime.today() == datetime.datetime.fromtimestamp(2)
+        assert datetime.today() == datetime.fromtimestamp(2)
       
         
 def test_select_with_timeout():
@@ -62,7 +71,7 @@ def test_select_with_timeout():
         
         assert select.select([], [], [event], 6) == ([], [], [event])
         assert time.time() == 2
-        assert datetime.datetime.today() == datetime.datetime.fromtimestamp(2)
+        assert datetime.today() == datetime.fromtimestamp(2)
      
         
 def test_select_timeout_occurring():
@@ -73,4 +82,4 @@ def test_select_timeout_occurring():
         
         assert select.select([event], [], [], 6) == ([], [], [])
         assert time.time() == 6
-        assert datetime.datetime.today() == datetime.datetime.fromtimestamp(6)
+        assert datetime.today() == datetime.fromtimestamp(6)
