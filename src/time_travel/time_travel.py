@@ -28,7 +28,7 @@ class TimeTravel(object):
         """
         self.events_pool = EventsPool()
         self.clock = TimeMachineClock(start_time, [self.events_pool])
-        
+
         patches = [] 
         for patcher in pkg_resources.iter_entry_points(
                 group='time_travel.patchers'):

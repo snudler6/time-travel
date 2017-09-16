@@ -36,6 +36,13 @@ class DatetimeSubclassMeta(DateSubclassMeta):
         return isinstance(obj, _real_datetime)
 
 
+def date_to_fakedate(date):
+    """Return mocked datetime object from original one."""
+    return FakeDate(date.year,
+                    date.month,
+                    date.day)
+
+
 def datetime_to_fakedatetime(datetime):
     """Return mocked datetime object from original one."""
     return FakeDatetime(datetime.year,
@@ -46,13 +53,6 @@ def datetime_to_fakedatetime(datetime):
                         datetime.second,
                         datetime.microsecond,
                         datetime.tzinfo)
-
-
-def date_to_fakedate(date):
-    """Return mocked datetime object from original one."""
-    return FakeDate(date.year,
-                    date.month,
-                    date.day)
 
 
 class FakeDate(with_metaclass(DateSubclassMeta, 'date', _real_date)):
@@ -208,16 +208,15 @@ class DatetimePatcher(BasicPatcher):
         local_names = tuple(real_name for real_name, _, _, _ in to_patch)
         real_id_to_fake = {id(real): fake for _, real, _, fake in to_patch}
 
-        # Save the current loaded modules
-        self.modules_at_start = set(sys.modules.keys())
-        
         modules = [
             module for mod_name, module in sys.modules.items() if
             mod_name is not None and module is not None and
             hasattr(module, '__name__') and
             module.__name__ not in ('datetime', 'datetime_patcher') and
             (not self.patched_modules or
-             module.__name__ in self.patched_modules)
+             # Not given list to patch then all;
+             # Or search only in given list.
+             module.__name__ in self.patched_modules) 
         ]
         
         for module in modules:
@@ -225,7 +224,7 @@ class DatetimePatcher(BasicPatcher):
                 try:
                     attribute_value = getattr(module, attr)
                 except (ValueError, AttributeError, ImportError):
-                    # Some libraries, this happen.
+                    # For some libraries, this happen.
                     continue
                 
                 if attr in local_names or\
@@ -238,6 +237,9 @@ class DatetimePatcher(BasicPatcher):
                 
     def stop(self):
         """Stop the patching of datetime module."""
+        datetime.date = _real_date
+        datetime.datetime = _real_datetime
+        
         for module, attribute, original_value in self._undo_set:
             setattr(module, attribute, original_value)
             

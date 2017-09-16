@@ -51,14 +51,20 @@ def test_patch_stop_afer_scope_end():
             
     assert time.time() != 3600
     assert datetime_cls.today() != datetime_cls.fromtimestamp(3600)
-            
-            
-def test_sub_module_patching():
+
+
+def test_inner_importing_of_datetime():
+    with TimeTravel(patched_modules=__name__):
+        import datetime
+        assert datetime.date.today() == datetime.date.fromtimestamp(0)
+
+
+def test_no_renaming_patching():
     with TimeTravel(patched_modules=__name__) as t:
         
-        assert datetime_cls.today() == datetime_cls.fromtimestamp(0)
+        assert datetime.today() == datetime_cls.fromtimestamp(0)
         t.clock.time = 3600
-        assert datetime_cls.today() == datetime_cls.fromtimestamp(3600)
+        assert datetime.today() == datetime_cls.fromtimestamp(3600)
 
 
 def test_sleep_changing_datetime_now():
