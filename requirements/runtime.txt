@@ -1,3 +1,2 @@
 mock
 enum34
-python-dateutil

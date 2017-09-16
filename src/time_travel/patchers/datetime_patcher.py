@@ -3,9 +3,7 @@
 from .basic_patcher import BasicPatcher
 
 import sys
-import mock
 import datetime
-from dateutil.tz import tzlocal
 
 try:
     import copy_reg as copyreg
@@ -119,13 +117,6 @@ class FakeDatetime(with_metaclass(DatetimeSubclassMeta, 'datetime',
         else:
             return result
 
-    def astimezone(self, tz=None):
-        """Add here a better docstring."""
-        if tz is None:
-            tz = tzlocal()
-        return datetime_to_fakedatetime(
-            _real_datetime.astimezone(self, tz))
-
     @classmethod
     def now(cls, tz=None):
         """Add here a better docstring."""
@@ -200,9 +191,7 @@ class DatetimePatcher(BasicPatcher):
         self.patched_module = name
         
         self.patches = []
-        #         if name is not None:
-        #             self.patches.append(mock.patch(name + '.datetime',
-        #                                            FakeDatetime))
+        self._undo_set = set()
         
     def start(self):
         """Start the patch of datetime.datetime class.
@@ -243,19 +232,32 @@ class DatetimePatcher(BasicPatcher):
         ]
         
         for module in modules:
-            attrs = [attr for attr in dir(module) if
-                     hasattr(module, attr) and
-                     attr not in local_names and
-                     id(getattr(module, attr)) in real_ids]
-            for module_attribute in attrs:
-                # try:
-                #     attribute_value = getattr(module, module_attribute)
-                # except (ImportError, AttributeError, TypeError):
-                #     # For certain libraries, this can result in Error
-                #     continue
-                attribute_value = getattr(module, module_attribute)
-                fake = fakes.get(id(attribute_value))
-                setattr(module, module_attribute, fake)
+            for attr in dir(module):
+                try:
+                    attribute_value = getattr(module, attr)
+                except (ValueError, AttributeError, ImportError):
+                    # Some libraries, this happen.
+                    continue
                 
+                if attr in local_names or id(attribute_value) not in real_ids:
+                    continue
+                    
+                fake = fakes.get(id(attribute_value))
+                setattr(module, attr, fake)
+                self._save_for_undo(module, attr, attribute_value)
+                
+    def stop(self):
+        """Stop the patching of datetime module."""
+        for module, attribute, original_value in self._undo_set:
+            setattr(module, attribute, original_value)
+            
+        self._undo_set = set()
+        
+        copyreg.dispatch_table.pop(_real_datetime)
+        copyreg.dispatch_table.pop(_real_date)
+                
+    def _save_for_undo(self, module, attribute, original_value):
+        self._undo_set.add((module, attribute, original_value))
+    
     def _now(self):
         return _real_datetime.fromtimestamp(self.clock.time)

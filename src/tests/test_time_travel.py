@@ -35,6 +35,15 @@ def test_datetime_patch_set_time():
             datetime_cls.fromtimestamp(3600)
 
 
+def test_patch_without_module_name():
+    with TimeTravel() as t:
+        
+        assert datetime_cls.utcnow() == datetime_cls.fromtimestamp(0)
+        t.clock.time = 3600
+        assert datetime_cls.now() ==\
+            datetime_cls.fromtimestamp(3600)
+
+
 def test_patch_stop_afer_scope_end():
     with TimeTravel(name=__name__) as t:
         
