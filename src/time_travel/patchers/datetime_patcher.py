@@ -209,8 +209,6 @@ class DatetimePatcher(BasicPatcher):
         
         This method overrides the method of the basic patcher.
         """
-        print
-        print 'patching datetime:'
         for patch in self.patches:
             patch.start()
         
@@ -249,13 +247,7 @@ class DatetimePatcher(BasicPatcher):
                      hasattr(module, attr) and
                      attr not in local_names and
                      id(getattr(module, attr)) in real_ids]
-            if attrs:
-                print "{}: {}".format(module.__name__, attrs)
-                print len(attrs)
-            for module_attribute in (attr for attr in dir(module) if
-                                     hasattr(module, attr) and
-                                     attr not in local_names and
-                                     id(getattr(module, attr)) in real_ids):
+            for module_attribute in attrs:
                 # try:
                 #     attribute_value = getattr(module, module_attribute)
                 # except (ImportError, AttributeError, TypeError):
@@ -265,7 +257,5 @@ class DatetimePatcher(BasicPatcher):
                 fake = fakes.get(id(attribute_value))
                 setattr(module, module_attribute, fake)
                 
-        print
-    
     def _now(self):
         return _real_datetime.fromtimestamp(self.clock.time)
