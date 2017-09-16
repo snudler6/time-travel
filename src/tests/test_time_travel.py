@@ -8,7 +8,7 @@ from datetime import datetime as datetime_cls
 
 
 def test_time_patch_set_time():
-    with TimeTravel() as t:
+    with TimeTravel(name=__name__) as t:
         
         assert time.time() == 0
         t.clock.time = 3600
@@ -16,7 +16,7 @@ def test_time_patch_set_time():
 
 
 def test_sleep_patch_sleep():
-    with TimeTravel() as t:
+    with TimeTravel(name=__name__) as t:
         
         assert time.time() == 0
         time.sleep(3600)
@@ -27,16 +27,16 @@ def test_sleep_patch_sleep():
         
         
 def test_datetime_patch_set_time():
-    with TimeTravel() as t:
+    with TimeTravel(name=__name__) as t:
         
-        assert datetime.today() == datetime.fromtimestamp(0)
+        assert datetime_cls.today() == datetime_cls.fromtimestamp(0)
         t.clock.time = 3600
-        assert datetime.today() ==\
-            datetime.fromtimestamp(3600)
+        assert datetime_cls.today() ==\
+            datetime_cls.fromtimestamp(3600)
             
             
 def test_sub_module_patching():
-    with TimeTravel() as t:
+    with TimeTravel(name=__name__) as t:
         
         assert datetime_cls.today() == datetime_cls.fromtimestamp(0)
         t.clock.time = 3600
@@ -44,25 +44,25 @@ def test_sub_module_patching():
                 
 
 def test_sleep_changing_datetime_now():
-    with TimeTravel():
-        assert datetime.today() == datetime.fromtimestamp(0)
+    with TimeTravel(name=__name__):
+        assert datetime_cls.today() == datetime_cls.fromtimestamp(0)
         time.sleep(3600)
-        assert datetime.now() == datetime.fromtimestamp(3600)
+        assert datetime_cls.now() == datetime_cls.fromtimestamp(3600)
 
 
 def test_select_no_timeout():
-    with TimeTravel() as t:
+    with TimeTravel(name=__name__) as t:
         event = mock.MagicMock()
         
         t.events_pool.add_future_event(2, event, t.events_types.select.WRITE)
         
         assert select.select([], [event], []) == ([], [event], [])
         assert time.time() == 2
-        assert datetime.today() == datetime.fromtimestamp(2)
+        assert datetime_cls.today() == datetime_cls.fromtimestamp(2)
       
         
 def test_select_with_timeout():
-    with TimeTravel() as t:
+    with TimeTravel(name=__name__) as t:
         event = mock.MagicMock()
         
         t.events_pool.add_future_event(2,
@@ -71,15 +71,15 @@ def test_select_with_timeout():
         
         assert select.select([], [], [event], 6) == ([], [], [event])
         assert time.time() == 2
-        assert datetime.today() == datetime.fromtimestamp(2)
+        assert datetime_cls.today() == datetime_cls.fromtimestamp(2)
      
         
 def test_select_timeout_occurring():
-    with TimeTravel() as t:
+    with TimeTravel(name=__name__) as t:
         event = mock.MagicMock()
         
         t.events_pool.add_future_event(10, event, t.events_types.select.READ)
         
         assert select.select([event], [], [], 6) == ([], [], [])
         assert time.time() == 6
-        assert datetime.today() == datetime.fromtimestamp(6)
+        assert datetime_cls.today() == datetime_cls.fromtimestamp(6)

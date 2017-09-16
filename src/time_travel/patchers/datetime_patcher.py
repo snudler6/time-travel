@@ -2,6 +2,8 @@
 
 from .basic_patcher import BasicPatcher
 
+import sys
+import mock
 import datetime
 from dateutil.tz import tzlocal
 
@@ -11,77 +13,29 @@ except ImportError:
     import copyreg
 
 
-real_datetime = datetime.datetime
-real_date = datetime.date
+_real_datetime = datetime.datetime
+_real_date = datetime.date
 
 
-def with_metaclass(meta, *bases):
+def with_metaclass(meta, name, *bases):
     """Create a base class with a metaclass."""
-    return meta("NewBase", bases, {})
-
-
-class DatetimeSubclassMeta(type):
-    """Datetime mock metaclass to check instancechek to the real class."""
+    return meta(name, bases, {})
     
-    @classmethod
-    def __instancecheck__(mcs, obj):
-        return isinstance(obj, real_datetime)
-    
-    
-class BaseMockedDate(real_date):
-    """Mock class to cover date class."""
-    
-    @classmethod
-    def today(cls):
-        """Return the current local date and time."""
-        return cls._now()
-
 
 class DateSubclassMeta(type):
     """Date mock metaclass to check instancechek to the real class."""
     
     @classmethod
     def __instancecheck__(mcs, obj):
-        return isinstance(obj, real_date)
+        return isinstance(obj, _real_date)
 
 
-class BaseMockedDatetime(real_datetime):
-    """Mock class to cover datetime class."""
+class DatetimeSubclassMeta(DateSubclassMeta):
+    """Datetime mock metaclass to check instancechek to the real class."""
     
     @classmethod
-    def now(cls, tz=None):
-        """Return the current local date and time."""
-        return cls._now().replace(tzinfo=tz)
-
-    @classmethod
-    def utcnow(cls):
-        """Return the current UTC date and time."""
-        return cls._now()
-    
-    @classmethod
-    def today(cls):
-        """Return the current local date and time."""
-        return cls._now()
-
-
-MockedDatetime = DatetimeSubclassMeta(
-    'datetime',
-    (BaseMockedDatetime,),
-    {})
-
-MockedDate = DateSubclassMeta(
-    'date',
-    (BaseMockedDate,),
-    {})
-
-
-class FakeDateMeta(type):
-    """Add here a better docstring."""
-    
-    @classmethod
-    def __instancecheck__(self, obj):
-        """Add here a better docstring."""
-        return isinstance(obj, real_date)
+    def __instancecheck__(mcs, obj):
+        return isinstance(obj, _real_datetime)
 
 
 def datetime_to_fakedatetime(datetime):
@@ -103,7 +57,7 @@ def date_to_fakedate(date):
                     date.day)
 
 
-class FakeDate(with_metaclass(FakeDateMeta, real_date)):
+class FakeDate(with_metaclass(DateSubclassMeta, 'date', _real_date)):
     """Add here a better docstring."""
     
     dates_to_freeze = []
@@ -111,19 +65,19 @@ class FakeDate(with_metaclass(FakeDateMeta, real_date)):
 
     def __new__(cls, *args, **kwargs):
         """Add here a better docstring."""
-        return real_date.__new__(cls, *args, **kwargs)
+        return _real_date.__new__(cls, *args, **kwargs)
 
     def __add__(self, other):
-        result = real_date.__add__(self, other)
+        result = _real_date.__add__(self, other)
         if result is NotImplemented:
             return result
         return date_to_fakedate(result)
 
     def __sub__(self, other):
-        result = real_date.__sub__(self, other)
+        result = _real_date.__sub__(self, other)
         if result is NotImplemented:
             return result
-        if isinstance(result, real_date):
+        if isinstance(result, _real_date):
             return date_to_fakedate(result)
         else:
             return result
@@ -135,20 +89,12 @@ class FakeDate(with_metaclass(FakeDateMeta, real_date)):
         return date_to_fakedate(result)
 
 
-FakeDate.min = date_to_fakedate(real_date.min)
-FakeDate.max = date_to_fakedate(real_date.max)
+FakeDate.min = date_to_fakedate(_real_date.min)
+FakeDate.max = date_to_fakedate(_real_date.max)
 
 
-class FakeDatetimeMeta(FakeDateMeta):
-    """Add here a better docstring."""
-    
-    @classmethod
-    def __instancecheck__(self, obj):
-        return isinstance(obj, real_datetime)
-
-
-class FakeDatetime(with_metaclass(FakeDatetimeMeta, real_datetime,
-                                  FakeDate)):
+class FakeDatetime(with_metaclass(DatetimeSubclassMeta, 'datetime',
+                                  _real_datetime, FakeDate)):
     """Add here a better docstring."""
     
     times_to_freeze = []
@@ -156,19 +102,19 @@ class FakeDatetime(with_metaclass(FakeDatetimeMeta, real_datetime,
 
     def __new__(cls, *args, **kwargs):
         """Add here a better docstring."""
-        return real_datetime.__new__(cls, *args, **kwargs)
+        return _real_datetime.__new__(cls, *args, **kwargs)
 
     def __add__(self, other):
-        result = real_datetime.__add__(self, other)
+        result = _real_datetime.__add__(self, other)
         if result is NotImplemented:
             return result
         return datetime_to_fakedatetime(result)
 
     def __sub__(self, other):
-        result = real_datetime.__sub__(self, other)
+        result = _real_datetime.__sub__(self, other)
         if result is NotImplemented:
             return result
-        if isinstance(result, real_datetime):
+        if isinstance(result, _real_datetime):
             return datetime_to_fakedatetime(result)
         else:
             return result
@@ -178,7 +124,7 @@ class FakeDatetime(with_metaclass(FakeDatetimeMeta, real_datetime,
         if tz is None:
             tz = tzlocal()
         return datetime_to_fakedatetime(
-            real_datetime.astimezone(self, tz))
+            _real_datetime.astimezone(self, tz))
 
     @classmethod
     def now(cls, tz=None):
@@ -207,8 +153,8 @@ class FakeDatetime(with_metaclass(FakeDatetimeMeta, real_datetime,
         return datetime_to_fakedatetime(result)
 
 
-FakeDatetime.min = datetime_to_fakedatetime(real_datetime.min)
-FakeDatetime.max = datetime_to_fakedatetime(real_datetime.max)
+FakeDatetime.min = datetime_to_fakedatetime(_real_datetime.min)
+FakeDatetime.max = datetime_to_fakedatetime(_real_datetime.max)
 
 
 def pickle_fake_date(datetime_):
@@ -244,62 +190,82 @@ class DatetimePatcher(BasicPatcher):
         - datetime.utcnow
     """
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name=None, **kwargs):
         """Create the patch."""
-        super(DatetimePatcher, self).__init__(*args, **kwargs)
-        
-        MockedDate._now = self._now
-        MockedDatetime._now = self._now
+        super(DatetimePatcher, self).__init__(**kwargs)
         
         FakeDate._now = self._now
         FakeDatetime._now = self._now
+        
+        self.patched_module = name
+        
+        self.patches = []
+        #         if name is not None:
+        #             self.patches.append(mock.patch(name + '.datetime',
+        #                                            FakeDatetime))
         
     def start(self):
         """Start the patch of datetime.datetime class.
         
         This method overrides the method of the basic patcher.
         """
+        print
+        print 'patching datetime:'
+        for patch in self.patches:
+            patch.start()
+        
         datetime.datetime = FakeDatetime
         datetime.date = FakeDate
         
-        copyreg.dispatch_table[real_datetime] = pickle_fake_datetime
-        copyreg.dispatch_table[real_date] = pickle_fake_date
+        copyreg.dispatch_table[_real_datetime] = pickle_fake_datetime
+        copyreg.dispatch_table[_real_date] = pickle_fake_date
         
         to_patch = [
-            ('real_date', real_date, 'FakeDate', FakeDate),
-            ('real_datetime', real_datetime,
-             'FakeDatetime', FakeDatetime),
+            # (local_name, orig_local_class, fake_name, fake_class)
+            ('_real_date', _real_date, 'FakeDate', FakeDate),
+            ('_real_datetime', _real_datetime, 'FakeDatetime', FakeDatetime),
         ]
-        real_names = tuple(real_name for real_name, _, _, _ in to_patch)
-        self.fake_names = tuple(fake_name for
-                                real_name, _, fake_name, _ in to_patch)
-        self.reals = dict((id(fake), real) for 
-                          real_name, real, fake_name, fake in to_patch)
-        fakes = dict((id(real), fake) for
-                     real_name, real, fake_name, fake in to_patch)
-
-        import sys
         
+        local_names = tuple(real_name for real_name, _, _, _ in to_patch)
+        self.fake_names = tuple(fake_name for _, _, fake_name, _ in to_patch)
+        self.reals = {id(fake): real for _, real, _, fake in to_patch}
+        fakes = {id(real): fake for _, real, _, fake in to_patch}
+        real_ids = [id(real) for _, real, _, _ in to_patch]
+
         # Save the current loaded modules
         self.modules_at_start = set(sys.modules.keys())
-
-        for mod_name, module in list(sys.modules.items()):
-            if mod_name is None or module is None:
-                continue
-            elif (not hasattr(module, "__name__") or
-                  module.__name__ in ('datetime', 'time', 'datetime_patcher')):
-                continue
-            for module_attribute in dir(module):
-                if module_attribute in real_names:
-                    continue
-                try:
-                    attribute_value = getattr(module, module_attribute)
-                except (ImportError, AttributeError, TypeError):
-                    # For certain libraries, this can result in Error
-                    continue
+        
+        modules = [
+            module for mod_name, module in sys.modules.items() if
+            mod_name is not None and module is not None and
+            hasattr(module, '__name__') and
+            module.__name__ not in ('datetime', 'datetime_patcher') and
+            (self.patched_module is None or
+             module.__name__ == self.patched_module)
+        ]
+        
+        for module in modules:
+            attrs = [attr for attr in dir(module) if
+                     hasattr(module, attr) and
+                     attr not in local_names and
+                     id(getattr(module, attr)) in real_ids]
+            if attrs:
+                print "{}: {}".format(module.__name__, attrs)
+                print len(attrs)
+            for module_attribute in (attr for attr in dir(module) if
+                                     hasattr(module, attr) and
+                                     attr not in local_names and
+                                     id(getattr(module, attr)) in real_ids):
+                # try:
+                #     attribute_value = getattr(module, module_attribute)
+                # except (ImportError, AttributeError, TypeError):
+                #     # For certain libraries, this can result in Error
+                #     continue
+                attribute_value = getattr(module, module_attribute)
                 fake = fakes.get(id(attribute_value))
-                if fake:
-                    setattr(module, module_attribute, fake)
+                setattr(module, module_attribute, fake)
+                
+        print
     
     def _now(self):
-        return real_datetime.fromtimestamp(self.clock.time)
+        return _real_datetime.fromtimestamp(self.clock.time)

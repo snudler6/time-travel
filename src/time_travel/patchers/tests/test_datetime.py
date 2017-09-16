@@ -10,7 +10,7 @@ class TestDatetimePatcher(object):
     def setup_method(self, method):
         """Start a datetime patcher."""
         self.clock = TimeMachineClock()
-        self.patcher = DatetimePatcher(clock=self.clock)
+        self.patcher = DatetimePatcher(clock=self.clock, name=__name__)
         self.patcher.start()
         
     def teardown_method(self, method):
