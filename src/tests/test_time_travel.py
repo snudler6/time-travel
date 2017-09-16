@@ -31,8 +31,7 @@ def test_datetime_patch_set_time():
         
         assert datetime_cls.today() == datetime_cls.fromtimestamp(0)
         t.clock.time = 3600
-        assert datetime_cls.today() ==\
-            datetime_cls.fromtimestamp(3600)
+        assert datetime_cls.today() == datetime_cls.fromtimestamp(3600)
 
 
 def test_patch_without_module_name():
@@ -40,8 +39,7 @@ def test_patch_without_module_name():
         
         assert datetime_cls.utcnow() == datetime_cls.fromtimestamp(0)
         t.clock.time = 3600
-        assert datetime_cls.now() ==\
-            datetime_cls.fromtimestamp(3600)
+        assert datetime_cls.now() == datetime_cls.fromtimestamp(3600)
 
 
 def test_patch_stop_afer_scope_end():
