@@ -26,7 +26,7 @@ with TimeTravel():
 ```
 
 ```python
-with TimeTravel(`__name__`):
+with TimeTravel(patched_modules=__name__):
     assert datetime.today() == datetime.fromtimestamp(0)
     time.sleep(3600)
     assert datetime.today() == datetime.fromtimestamp(3600)
@@ -72,7 +72,8 @@ with TimeTravel() as t:
 
 - time.time
 - time.sleep
-- datetime.datetime.today # Must import the module
+- datetime.date.today
+- datetime.datetime.today
 - datetime.datetime.now
 - datetime.datetime.utcnow
 - select.select
