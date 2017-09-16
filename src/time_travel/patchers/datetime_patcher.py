@@ -37,7 +37,7 @@ class DatetimeSubclassMeta(DateSubclassMeta):
 
 
 def datetime_to_fakedatetime(datetime):
-    """Add here a better docstring."""
+    """Return mocked datetime object from original one."""
     return FakeDatetime(datetime.year,
                         datetime.month,
                         datetime.day,
@@ -49,17 +49,17 @@ def datetime_to_fakedatetime(datetime):
 
 
 def date_to_fakedate(date):
-    """Add here a better docstring."""
+    """Return mocked datetime object from original one."""
     return FakeDate(date.year,
                     date.month,
                     date.day)
 
 
 class FakeDate(with_metaclass(DateSubclassMeta, 'date', _real_date)):
-    """Add here a better docstring."""
+    """Mocked datetime.date class."""
     
     def __new__(cls, *args, **kwargs):
-        """Add here a better docstring."""
+        """Return a new mocked date object."""
         return _real_date.__new__(cls, *args, **kwargs)
 
     def __add__(self, other):
@@ -79,7 +79,7 @@ class FakeDate(with_metaclass(DateSubclassMeta, 'date', _real_date)):
 
     @classmethod
     def today(cls):
-        """Add here a better docstring."""
+        """Return today's date."""
         result = cls._now()
         return date_to_fakedate(result)
 
@@ -90,10 +90,10 @@ FakeDate.max = date_to_fakedate(_real_date.max)
 
 class FakeDatetime(with_metaclass(DatetimeSubclassMeta, 'datetime',
                                   _real_datetime, FakeDate)):
-    """Add here a better docstring."""
+    """Mocked datetime.datetime class."""
     
     def __new__(cls, *args, **kwargs):
-        """Add here a better docstring."""
+        """Return a new mocked datetime object."""
         return _real_datetime.__new__(cls, *args, **kwargs)
 
     def __add__(self, other):
@@ -113,7 +113,7 @@ class FakeDatetime(with_metaclass(DatetimeSubclassMeta, 'datetime',
 
     @classmethod
     def now(cls, tz=None):
-        """Add here a better docstring."""
+        """Return a datetime object representing current time."""
         now = cls._now()
         if tz:
             result = tz.fromutc(now.replace(tzinfo=tz)) +\
@@ -124,12 +124,12 @@ class FakeDatetime(with_metaclass(DatetimeSubclassMeta, 'datetime',
 
     @classmethod
     def today(cls):
-        """Add here a better docstring."""
+        """Return a datetime object representing current time."""
         return cls.now(tz=None)
 
     @classmethod
     def utcnow(cls):
-        """Add here a better docstring."""
+        """Return a datetime object representing current time."""
         result = cls._now()
         return datetime_to_fakedatetime(result)
 
