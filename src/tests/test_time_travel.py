@@ -61,7 +61,7 @@ def test_sub_module_patching():
         assert datetime_cls.today() == datetime_cls.fromtimestamp(0)
         t.clock.time = 3600
         assert datetime_cls.today() == datetime_cls.fromtimestamp(3600)
-                
+
 
 def test_sleep_changing_datetime_now():
     with TimeTravel(patched_modules=__name__):
@@ -103,3 +103,15 @@ def test_select_timeout_occurring():
         assert select.select([event], [], [], 6) == ([], [], [])
         assert time.time() == 6
         assert datetime_cls.today() == datetime_cls.fromtimestamp(6)
+
+
+def test_poll():
+    with TimeTravel(patched_modules=__name__) as t:
+        fd = mock.MagicMock()
+        t.events_pool.add_future_event(2, fd, select.POLLIN)
+
+        poll = select.poll()
+        poll.register(fd, select.POLLIN | select.POLLOUT)
+
+        assert poll.poll() == [(fd, select.POLLIN)]
+        assert time.time() == 2

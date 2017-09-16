@@ -16,6 +16,7 @@ setup(
         'time_travel.patchers': [
             'datetime_patcher = src.time_travel.patchers.datetime_patcher:DatetimePatcher',
             'select_patcher = src.time_travel.patchers.select_patcher:SelectPatcher',
+            'poll_patcher = src.time_travel.patchers.poll_patcher:PollPatcher',
             'time_patcher = src.time_travel.patchers.time_patcher:TimePatcher',
         ],
     }
