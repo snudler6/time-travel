@@ -8,7 +8,7 @@ from datetime import datetime as datetime_cls
 
 
 def test_time_patch_set_time():
-    with TimeTravel(name=__name__) as t:
+    with TimeTravel(patched_modules=__name__) as t:
         
         assert time.time() == 0
         t.clock.time = 3600
@@ -16,7 +16,7 @@ def test_time_patch_set_time():
 
 
 def test_sleep_patch_sleep():
-    with TimeTravel(name=__name__) as t:
+    with TimeTravel(patched_modules=(__name__,)) as t:
         
         assert time.time() == 0
         time.sleep(3600)
@@ -27,7 +27,7 @@ def test_sleep_patch_sleep():
         
         
 def test_datetime_patch_set_time():
-    with TimeTravel(name=__name__) as t:
+    with TimeTravel(patched_modules=[__name__]) as t:
         
         assert datetime_cls.today() == datetime_cls.fromtimestamp(0)
         t.clock.time = 3600
@@ -45,7 +45,7 @@ def test_patch_without_module_name():
 
 
 def test_patch_stop_afer_scope_end():
-    with TimeTravel(name=__name__) as t:
+    with TimeTravel(patched_modules=__name__) as t:
         
         assert datetime_cls.now() == datetime_cls.fromtimestamp(0)
         t.clock.time = 3600
@@ -56,7 +56,7 @@ def test_patch_stop_afer_scope_end():
             
             
 def test_sub_module_patching():
-    with TimeTravel(name=__name__) as t:
+    with TimeTravel(patched_modules=__name__) as t:
         
         assert datetime_cls.today() == datetime_cls.fromtimestamp(0)
         t.clock.time = 3600
@@ -64,14 +64,14 @@ def test_sub_module_patching():
                 
 
 def test_sleep_changing_datetime_now():
-    with TimeTravel(name=__name__):
+    with TimeTravel(patched_modules=__name__):
         assert datetime_cls.today() == datetime_cls.fromtimestamp(0)
         time.sleep(3600)
         assert datetime_cls.now() == datetime_cls.fromtimestamp(3600)
 
 
 def test_select_no_timeout():
-    with TimeTravel(name=__name__) as t:
+    with TimeTravel(patched_modules=__name__) as t:
         event = mock.MagicMock()
         
         t.events_pool.add_future_event(2, event, t.events_types.select.WRITE)
@@ -82,7 +82,7 @@ def test_select_no_timeout():
       
         
 def test_select_with_timeout():
-    with TimeTravel(name=__name__) as t:
+    with TimeTravel(patched_modules=__name__) as t:
         event = mock.MagicMock()
         
         t.events_pool.add_future_event(2,
@@ -95,7 +95,7 @@ def test_select_with_timeout():
      
         
 def test_select_timeout_occurring():
-    with TimeTravel(name=__name__) as t:
+    with TimeTravel(patched_modules=__name__) as t:
         event = mock.MagicMock()
         
         t.events_pool.add_future_event(10, event, t.events_types.select.READ)

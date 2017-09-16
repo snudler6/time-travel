@@ -58,9 +58,6 @@ def date_to_fakedate(date):
 class FakeDate(with_metaclass(DateSubclassMeta, 'date', _real_date)):
     """Add here a better docstring."""
     
-    dates_to_freeze = []
-    tz_offsets = []
-
     def __new__(cls, *args, **kwargs):
         """Add here a better docstring."""
         return _real_date.__new__(cls, *args, **kwargs)
@@ -95,9 +92,6 @@ class FakeDatetime(with_metaclass(DatetimeSubclassMeta, 'datetime',
                                   _real_datetime, FakeDate)):
     """Add here a better docstring."""
     
-    times_to_freeze = []
-    tz_offsets = []
-
     def __new__(cls, *args, **kwargs):
         """Add here a better docstring."""
         return _real_datetime.__new__(cls, *args, **kwargs)
@@ -127,10 +121,6 @@ class FakeDatetime(with_metaclass(DatetimeSubclassMeta, 'datetime',
         else:
             result = now
         return datetime_to_fakedatetime(result)
-
-    def date(self):
-        """Add here a better docstring."""
-        return date_to_fakedate(self)
 
     @classmethod
     def today(cls):
@@ -179,18 +169,23 @@ class DatetimePatcher(BasicPatcher):
         - datetime.today
         - datetime.now
         - datetime.utcnow
+        - date.today
     """
     
-    def __init__(self, name=None, **kwargs):
+    def __init__(self, patched_modules=None, **kwargs):
         """Create the patch."""
         super(DatetimePatcher, self).__init__(**kwargs)
         
         FakeDate._now = self._now
         FakeDatetime._now = self._now
         
-        self.patched_module = name
+        if patched_modules is None:
+            self.patched_modules = []
+        elif isinstance(patched_modules, (list, tuple)):
+            self.patched_modules = patched_modules
+        else:
+            self.patched_modules = [patched_modules]
         
-        self.patches = []
         self._undo_set = set()
         
     def start(self):
@@ -198,26 +193,20 @@ class DatetimePatcher(BasicPatcher):
         
         This method overrides the method of the basic patcher.
         """
-        for patch in self.patches:
-            patch.start()
-        
         datetime.datetime = FakeDatetime
         datetime.date = FakeDate
         
         copyreg.dispatch_table[_real_datetime] = pickle_fake_datetime
         copyreg.dispatch_table[_real_date] = pickle_fake_date
         
-        to_patch = [
+        to_patch = (
             # (local_name, orig_local_class, fake_name, fake_class)
             ('_real_date', _real_date, 'FakeDate', FakeDate),
             ('_real_datetime', _real_datetime, 'FakeDatetime', FakeDatetime),
-        ]
+        )
         
         local_names = tuple(real_name for real_name, _, _, _ in to_patch)
-        self.fake_names = tuple(fake_name for _, _, fake_name, _ in to_patch)
-        self.reals = {id(fake): real for _, real, _, fake in to_patch}
-        fakes = {id(real): fake for _, real, _, fake in to_patch}
-        real_ids = [id(real) for _, real, _, _ in to_patch]
+        real_id_to_fake = {id(real): fake for _, real, _, fake in to_patch}
 
         # Save the current loaded modules
         self.modules_at_start = set(sys.modules.keys())
@@ -227,8 +216,8 @@ class DatetimePatcher(BasicPatcher):
             mod_name is not None and module is not None and
             hasattr(module, '__name__') and
             module.__name__ not in ('datetime', 'datetime_patcher') and
-            (self.patched_module is None or
-             module.__name__ == self.patched_module)
+            (not self.patched_modules or
+             module.__name__ in self.patched_modules)
         ]
         
         for module in modules:
@@ -239,10 +228,11 @@ class DatetimePatcher(BasicPatcher):
                     # Some libraries, this happen.
                     continue
                 
-                if attr in local_names or id(attribute_value) not in real_ids:
+                if attr in local_names or\
+                        id(attribute_value) not in real_id_to_fake.keys():
                     continue
                     
-                fake = fakes.get(id(attribute_value))
+                fake = real_id_to_fake.get(id(attribute_value))
                 setattr(module, attr, fake)
                 self._save_for_undo(module, attr, attribute_value)
                 
