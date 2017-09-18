@@ -11,7 +11,7 @@ class TestDatetimePatcher(object):
         """Start a datetime patcher."""
         self.clock = TimeMachineClock()
         self.patcher = DatetimePatcher(clock=self.clock,
-                                       patched_modules=__name__)
+                                       modules_to_patch=__name__)
         self.patcher.start()
         
     def teardown_method(self, method):
