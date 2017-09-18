@@ -4,7 +4,7 @@
 python time libraries mocking
 
 ### time-travel is the fun and easy way to unit-test time sensetive modules.
-### time-travel let you write determenistic test for long and even infinite time scenarios.
+### time-travel lets you write determenistic test for long and even infinite time scenarios.
 
 ## Usage
 
