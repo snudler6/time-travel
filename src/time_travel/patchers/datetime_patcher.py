@@ -1,4 +1,28 @@
-"""A patch to the datetime module."""
+"""A patch to the datetime module.
+
+This patcher is based on the work done by: spulec/freezegun under
+https://github.com/spulec/freezegun
+
+Copyright (C) 2017 spulec/freezegun
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+Modifications:
+
+Modifications to the file was to leave the patching of datetime libray only,
+and remove any other patching or any other advanced logic.
+"""
 
 from .basic_patcher import BasicPatcher
 
@@ -62,21 +86,6 @@ class FakeDate(with_metaclass(DateSubclassMeta, 'date', _real_date)):
         """Return a new mocked date object."""
         return _real_date.__new__(cls, *args, **kwargs)
 
-    def __add__(self, other):
-        result = _real_date.__add__(self, other)
-        if result is NotImplemented:
-            return result
-        return date_to_fakedate(result)
-
-    def __sub__(self, other):
-        result = _real_date.__sub__(self, other)
-        if result is NotImplemented:
-            return result
-        if isinstance(result, _real_date):
-            return date_to_fakedate(result)
-        else:
-            return result
-
     @classmethod
     def today(cls):
         """Return today's date."""
@@ -95,21 +104,6 @@ class FakeDatetime(with_metaclass(DatetimeSubclassMeta, 'datetime',
     def __new__(cls, *args, **kwargs):
         """Return a new mocked datetime object."""
         return _real_datetime.__new__(cls, *args, **kwargs)
-
-    def __add__(self, other):
-        result = _real_datetime.__add__(self, other)
-        if result is NotImplemented:
-            return result
-        return datetime_to_fakedatetime(result)
-
-    def __sub__(self, other):
-        result = _real_datetime.__sub__(self, other)
-        if result is NotImplemented:
-            return result
-        if isinstance(result, _real_datetime):
-            return datetime_to_fakedatetime(result)
-        else:
-            return result
 
     @classmethod
     def now(cls, tz=None):
@@ -208,15 +202,12 @@ class DatetimePatcher(BasicPatcher):
         local_names = tuple(real_name for real_name, _, _, _ in to_patch)
         real_id_to_fake = {id(real): fake for _, real, _, fake in to_patch}
 
-        modules = [
-            module for mod_name, module in sys.modules.items() if
-            mod_name is not None and module is not None and
-            hasattr(module, '__name__') and
-            module.__name__ not in ('datetime', 'datetime_patcher') and
-            (not self.patched_modules or
-             # Not given list to patch then all;
-             # Or search only in given list.
-             module.__name__ in self.patched_modules) 
+        modules = [sys.modules[name] for name in self.patched_modules] if \
+            self.patched_modules else [
+                module for mod_name, module in sys.modules.items() if
+                mod_name is not None and module is not None and
+                hasattr(module, '__name__') and
+                module.__name__ not in ('datetime', 'datetime_patcher') 
         ]
         
         for module in modules:
