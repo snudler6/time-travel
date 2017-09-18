@@ -4,6 +4,7 @@ from time_travel.events_pool import EventsPool
 
 import select
 import mock
+import sys
 import pytest
 
 
@@ -12,6 +13,8 @@ def sec2msec(sec):
     return int(sec * 1000)
 
 
+@pytest.mark.skipif(sys.platform == 'win32',
+                    reason='select.poll is not supported under win32')
 class TestPollPatcher(object):
 
     def setup_method(self, method):

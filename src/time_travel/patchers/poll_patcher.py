@@ -6,9 +6,6 @@ import select as select_lib
 import mock
 
 
-DEFAULT_EVENTMASK = select_lib.POLLIN | select_lib.POLLOUT | select_lib.POLLPRI
-
-
 class MockPollObject(object):
     """A mock poll object."""
 
@@ -19,8 +16,12 @@ class MockPollObject(object):
 
         self.poll_events = {}
 
-    def register(self, fd, eventmask=DEFAULT_EVENTMASK):
+    def register(self, fd, eventmask=None):
         """Register a file descriptor with the fake polling object."""
+        if eventmask is None:
+            eventmask = (select_lib.POLLIN |
+                         select_lib.POLLOUT |
+                         select_lib.POLLPRI)
         self.poll_events[fd] = eventmask
 
     def modify(self, fd, eventmask):

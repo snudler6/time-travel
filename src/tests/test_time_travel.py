@@ -4,6 +4,8 @@ import time
 from datetime import datetime
 import select
 import mock
+import pytest
+import sys
 
 
 def test_time_patch_set_time():
@@ -76,6 +78,8 @@ def test_select_timeout_occurring():
         assert datetime.today() == datetime.fromtimestamp(6)
 
 
+@pytest.mark.skipif(sys.platform == 'win32',
+                    reason='select.poll is not supported under win32')
 def test_poll():
     with TimeTravel() as t:
         fd = mock.MagicMock()
