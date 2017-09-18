@@ -4,12 +4,15 @@
 python time libraries mocking
 
 ### time-travel is the fun and easy way to unit-test time sensetive modules.
-### Can write determenistic test for long and even infinite time scenarios.
+### time-travel lets you write determenistic test for long and even infinite time scenarios.
 
 ## Usage
 
-`TimeTravel` is context manager patching all time modules currently patched
-in a single line.
+`TimeTravel` is context manager patching all* time and I\O related modules in a single line.
+
+\* All modules currently patched :) .
+
+In order to improve TimeTravel's performance, you can give it the names of modules you want to patch (in list, tuple or single name). If you want to patch the current module, you can use the local variable `__name__`.
 
 ### Examples
 
@@ -25,10 +28,20 @@ with TimeTravel():
 ```
 
 ```python
-with TimeTravel():
+with TimeTravel(modules_to_patch=__name__):
     assert datetime.today() == datetime.fromtimestamp(0)
     time.sleep(3600)
     assert datetime.today() == datetime.fromtimestamp(3600)
+```
+
+```python
+import module1
+import module2
+
+with TimeTravel(modules_to_patch=['module1', 'module2']) as time_machine:
+    time_machine.set_time(1237)
+    module1.very_long_method()
+    module2.time_sensitive_method()
 ```
 
 #### Patching event based modules
@@ -61,7 +74,10 @@ with TimeTravel() as t:
 
 - time.time
 - time.sleep
+- datetime.date.today
 - datetime.datetime.today
+- datetime.datetime.now
+- datetime.datetime.utcnow
 - select.select
 - select.poll
 

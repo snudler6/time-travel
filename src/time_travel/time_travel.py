@@ -19,7 +19,7 @@ class TimeTravel(object):
     class EventsType(object):
         """Empty class to register events types on."""
     
-    def __init__(self, start_time=0):
+    def __init__(self, start_time=0, **kwargs):
         """Create the patch.
         
         @start_time is time in seconds since the epoch.
@@ -32,7 +32,8 @@ class TimeTravel(object):
                 group='time_travel.patchers'):
             patches.append(patcher.load())
 
-        self.patches = [patcher(self.clock, self.events_pool)
+        self.patches = [patcher(clock=self.clock, events_pool=self.events_pool,
+                                **kwargs)
                         for patcher in patches]
         
         self.events_types = TimeTravel.EventsType()
