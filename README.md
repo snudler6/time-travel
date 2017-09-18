@@ -8,7 +8,9 @@ python time libraries mocking
 
 ## Usage
 
-`TimeTravel` is context manager patching all time modules currently patched in a single line.
+`TimeTravel` is context manager patching all* time and I\O related modules in a single line.
+
+* All modules currently patched :) .
 
 In order to improve TimeTravel's performance, you can give it the names of modules you want to patch (in list, tuple or single name). If you want to patch the current module, you can use the local variable `__name__`.
 
@@ -39,7 +41,7 @@ import module2
 with TimeTravel(patched_modules=['module1', 'module2']) as time_machine:
     time_machine.set_time(1237)
     module1.very_long_method()
-    module2.time_sensative_method()
+    module2.time_sensitive_method()
 ```
 
 #### Patching event based modules

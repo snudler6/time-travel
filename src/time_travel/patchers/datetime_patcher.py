@@ -141,7 +141,6 @@ def pickle_fake_date(datetime_):
     )
 
 
-@staticmethod
 def pickle_fake_datetime(datetime_):
     """Pickle function for FakeDatetime."""
     return FakeDatetime, (
@@ -166,19 +165,12 @@ class DatetimePatcher(BasicPatcher):
         - date.today
     """
     
-    def __init__(self, patched_modules=None, **kwargs):
+    def __init__(self, **kwargs):
         """Create the patch."""
         super(DatetimePatcher, self).__init__(**kwargs)
         
         FakeDate._now = self._now
         FakeDatetime._now = self._now
-        
-        if patched_modules is None:
-            self.patched_modules = []
-        elif isinstance(patched_modules, (list, tuple)):
-            self.patched_modules = patched_modules
-        else:
-            self.patched_modules = [patched_modules]
         
         self._undo_set = set()
         
@@ -190,6 +182,7 @@ class DatetimePatcher(BasicPatcher):
         datetime.datetime = FakeDatetime
         datetime.date = FakeDate
         
+        # Change pickle function for datetime to handle mocked datetime.
         copyreg.dispatch_table[_real_datetime] = pickle_fake_datetime
         copyreg.dispatch_table[_real_date] = pickle_fake_date
         
@@ -202,28 +195,43 @@ class DatetimePatcher(BasicPatcher):
         local_names = tuple(real_name for real_name, _, _, _ in to_patch)
         real_id_to_fake = {id(real): fake for _, real, _, fake in to_patch}
 
-        modules = [sys.modules[name] for name in self.patched_modules] if \
-            self.patched_modules else [
+        # Create the list of all modules to search for datetime and date
+        # classes.
+        if self.patched_modules:
+            # If only a given list of modules is required to be patched
+            modules = [sys.modules[name] for name in self.patched_modules] 
+        else:
+            # Patch on all loaded modules
+            modules = [
                 module for mod_name, module in sys.modules.items() if
-                mod_name is not None and module is not None and
+                mod_name is not None and
+                module is not None and
                 hasattr(module, '__name__') and
+                # Don't patch inside this module,
+                # or inside the original module.
                 module.__name__ not in ('datetime', 'datetime_patcher') 
-        ]
+            ]
         
         for module in modules:
             for attr in dir(module):
                 try:
+                    # Get any attribute loaded on the module.
                     attribute_value = getattr(module, attr)
                 except (ValueError, AttributeError, ImportError):
                     # For some libraries, this happen.
                     continue
                 
-                if attr in local_names or\
+                # If the attribute is on this module - avoid recursion.
+                # Do stuff only if the attribute is datetime or date classes.
+                if attr in local_names or \
                         id(attribute_value) not in real_id_to_fake.keys():
                     continue
                     
+                # Find the relative mock object for the original class.
                 fake = real_id_to_fake.get(id(attribute_value))
+                # Change the class to the mocked one in the given module.
                 setattr(module, attr, fake)
+                # Save the original class for later - when stopping the patch.
                 self._save_for_undo(module, attr, attribute_value)
                 
     def stop(self):
@@ -234,7 +242,7 @@ class DatetimePatcher(BasicPatcher):
         for module, attribute, original_value in self._undo_set:
             setattr(module, attribute, original_value)
             
-        self._undo_set = set()
+        self._undo_set.clear()
         
         copyreg.dispatch_table.pop(_real_datetime)
         copyreg.dispatch_table.pop(_real_date)

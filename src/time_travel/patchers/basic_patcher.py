@@ -4,10 +4,21 @@
 class BasicPatcher(object):
     """Base class for patching time modules."""
     
-    def __init__(self, clock, events_pool=None, **kwargs):
+    def __init__(self,
+                 clock,
+                 events_pool=None,
+                 patched_modules=None,
+                 **kwargs):
         """Create the patch."""
         self.clock = clock
         self.events_pool = events_pool
+        
+        if patched_modules is None:
+            self.patched_modules = []
+        elif isinstance(patched_modules, (list, tuple)):
+            self.patched_modules = patched_modules
+        else:
+            self.patched_modules = [patched_modules]
         
         self.patches = []
         
