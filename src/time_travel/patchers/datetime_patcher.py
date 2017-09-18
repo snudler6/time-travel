@@ -197,9 +197,9 @@ class DatetimePatcher(BasicPatcher):
 
         # Create the list of all modules to search for datetime and date
         # classes.
-        if self.patched_modules:
+        if self.modules_to_patch:
             # If only a given list of modules is required to be patched
-            modules = [sys.modules[name] for name in self.patched_modules] 
+            modules = [sys.modules[name] for name in self.modules_to_patch] 
         else:
             # Patch on all loaded modules
             modules = [
@@ -209,7 +209,7 @@ class DatetimePatcher(BasicPatcher):
                 hasattr(module, '__name__') and
                 # Don't patch inside this module,
                 # or inside the original module.
-                module.__name__ not in ('datetime', 'datetime_patcher') 
+                module.__name__ not in ('datetime', __name__) 
             ]
         
         for module in modules:
