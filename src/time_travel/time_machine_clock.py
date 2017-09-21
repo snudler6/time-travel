@@ -1,7 +1,7 @@
 """A single clock for all patchers."""
 
 
-MIN_START_TIME = 100000.0  # Windows support unix times starting from 86,400
+MIN_START_TIME = 86400.0  # Windows support unix times starting from 86,400.
 
 
 class TimeMachineClock(object):
