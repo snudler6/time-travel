@@ -10,15 +10,8 @@ environment:
     - TOXENV: "pypy"
 
 install:
-  - echo Installed Pythons
-  - dir c:\Python*
-
-  # install pypy using choco (redirect to a file and write to console in case
-  # choco install returns non-zero, because choco install python.pypy is too
-  # noisy)
-  - if not exist "C:\tools\pypy\pypy" choco install python.pypy > pypy-inst.log 2>&1 || (type pypy-inst.log & exit /b 1)
-  - set PATH=C:\tools\pypy\pypy;%PATH% # so tox can find pypy
-  - echo PyPy installed
+  - if "%TOXENV%"=="pypy" choco install python.pypy
+  - if "%TOXENV%"=="pypy" set PATH=C:\tools\pypy\pypy;%PATH% # so tox can find pypy
 
   - pip install tox
 
