@@ -7,11 +7,13 @@ python time libraries mocking
 ## Usage
 
 `TimeTravel` is context manager patching all* time and I\O related modules in a 
-single line. Inside the time travel context manager, the initial time is set to 
-86,400.0 seconds in order to support windows (this is the lowest acceptable 
-value by the OS). This value is exported via ``time_travel.MIN_START_TIME``.
+single line. 
 
 \* All modules currently patched :).
+
+The initial time within the time travel context manager is set to 
+86,400.0 seconds in order to support windows (this is the lowest acceptable 
+value by the OS). This value is exported via ``time_travel.MIN_START_TIME``.
 
 In order to improve TimeTravel's performance, you can give it the names of 
 modules you want to patch (in list, tuple or single name). 
