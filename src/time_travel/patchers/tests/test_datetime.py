@@ -3,6 +3,7 @@ from time_travel.time_travel import TimeMachineClock
 
 import datetime
 from datetime import datetime as orig_datetime_class
+from .utils import _t
 
 
 class TestDatetimePatcher(object):
@@ -19,25 +20,28 @@ class TestDatetimePatcher(object):
         self.patcher.stop()
 
     def test_datetime_today(self):
-        assert datetime.datetime.today() == datetime.datetime.fromtimestamp(0)
+        assert datetime.datetime.today() == \
+            datetime.datetime.fromtimestamp(_t(0))
         
-        self.clock.time = 3600
-        assert datetime.datetime.today() ==\
-            datetime.datetime.fromtimestamp(3600)
+        self.clock.time = _t(3600)
+        assert datetime.datetime.today() == \
+            datetime.datetime.fromtimestamp(_t(3600))
             
     def test_datetime_utcnow(self):
-        assert datetime.datetime.utcnow() == datetime.datetime.fromtimestamp(0)
+        assert datetime.datetime.utcnow() == \
+            datetime.datetime.fromtimestamp(_t(0))
         
-        self.clock.time = 3600
-        assert datetime.datetime.utcnow() ==\
-            datetime.datetime.fromtimestamp(3600)
+        self.clock.time = _t(3600)
+        assert datetime.datetime.utcnow() == \
+            datetime.datetime.fromtimestamp(_t(3600))
             
     def test_datetime_now(self):
-        assert datetime.datetime.now() == datetime.datetime.fromtimestamp(0)
+        assert datetime.datetime.now() == \
+            datetime.datetime.fromtimestamp(_t(0))
         
-        self.clock.time = 3600
-        assert datetime.datetime.now() ==\
-            datetime.datetime.fromtimestamp(3600)
+        self.clock.time = _t(3600)
+        assert datetime.datetime.now() == \
+            datetime.datetime.fromtimestamp(_t(3600))
             
     def test_isinstance_works(self):
         assert isinstance(datetime.datetime.today(),
