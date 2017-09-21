@@ -24,43 +24,45 @@ class TestSelectPatcher(object):
         
     def test_basic_usage(self):
         fd = mock.MagicMock()
-        self.events_pool.add_future_event(2, fd, SelectPatcher.EventTypes.READ)
+        self.events_pool.add_future_event(100002,
+                                          fd,
+                                          SelectPatcher.EventTypes.READ)
         
         assert select.select([fd], [], [], 17) == ([fd], [], [])
-        assert self.clock.time == 2
+        assert self.clock.time == 100002
 
     def test_empty_lists(self):
         assert select.select([], [], [], 17) == ([], [], [])
-        assert self.clock.time == 17
+        assert self.clock.time == 100017
     
     def test_future_event_after_timeout(self):
         fd = mock.MagicMock()
-        self.events_pool.add_future_event(27,
+        self.events_pool.add_future_event(100027,
                                           fd,
                                           SelectPatcher.EventTypes.READ)
         
         assert select.select([], [fd], [], 17) == ([], [], [])
-        assert self.clock.time == 17
+        assert self.clock.time == 100017
         
     def test_adding_unwaited_fds(self):
         first_fd = mock.MagicMock(name='first_fd')
         second_fd = mock.MagicMock(name='second_fd')
         waited_for_fd = mock.MagicMock(name='waited_for_fd')
         
-        self.events_pool.add_future_event(3,
+        self.events_pool.add_future_event(100003,
                                           first_fd,
                                           SelectPatcher.EventTypes.READ)
-        self.events_pool.add_future_event(4,
+        self.events_pool.add_future_event(100004,
                                           second_fd,
                                           SelectPatcher.EventTypes.WRITE)
-        self.events_pool.add_future_event(5,
+        self.events_pool.add_future_event(100005,
                                           waited_for_fd,
                                           SelectPatcher.EventTypes.READ)
         
         assert select.select([waited_for_fd], [], [], 7) == \
             ([waited_for_fd], [], [])
         
-        assert self.clock.time == 5
+        assert self.clock.time == 100005
         
     def test_multiple_fds_for_same_time(self):
         fd1 = mock.MagicMock(name='fd1')
@@ -69,19 +71,19 @@ class TestSelectPatcher(object):
         fd4 = mock.MagicMock(name='fd4')
         unwaited_fd = mock.MagicMock(name='unwaited_fd')
         
-        self.events_pool.add_future_event(3,
+        self.events_pool.add_future_event(100003,
                                           fd1,
                                           SelectPatcher.EventTypes.READ)
-        self.events_pool.add_future_event(3,
+        self.events_pool.add_future_event(100003,
                                           fd2,
                                           SelectPatcher.EventTypes.READ)
-        self.events_pool.add_future_event(3,
+        self.events_pool.add_future_event(100003,
                                           fd3,
                                           SelectPatcher.EventTypes.WRITE)
-        self.events_pool.add_future_event(3,
+        self.events_pool.add_future_event(100003,
                                           fd4,
                                           SelectPatcher.EventTypes.EXCEPTIONAL)
-        self.events_pool.add_future_event(3,
+        self.events_pool.add_future_event(100003,
                                           unwaited_fd,
                                           SelectPatcher.EventTypes.READ)
         
@@ -97,49 +99,49 @@ class TestSelectPatcher(object):
         for returned, expected in zip(returned_events, expected_events):
             assert set(returned) == set(expected)
         
-        assert self.clock.time == 3
+        assert self.clock.time == 100003
 
     def test_fd_not_returned_twice(self):
         fd = mock.MagicMock()
         
-        self.events_pool.add_future_event(3,
+        self.events_pool.add_future_event(100003,
                                           fd,
                                           SelectPatcher.EventTypes.EXCEPTIONAL)
         
         assert select.select([], [], [fd], 6) == ([], [], [fd])
-        assert self.clock.time == 3
+        assert self.clock.time == 100003
         
         assert select.select([], [], [fd], 6) == ([], [], [])
-        assert self.clock.time == 3 + 6
+        assert self.clock.time == 100003 + 6
           
     def test_same_fd_multiple_timestamps(self):
         fd = mock.MagicMock()
         
-        self.events_pool.add_future_event(1,
+        self.events_pool.add_future_event(100001,
                                           fd,
                                           SelectPatcher.EventTypes.EXCEPTIONAL)
-        self.events_pool.add_future_event(2,
+        self.events_pool.add_future_event(100002,
                                           fd,
                                           SelectPatcher.EventTypes.READ)
-        self.events_pool.add_future_event(2,
+        self.events_pool.add_future_event(100002,
                                           fd,
                                           SelectPatcher.EventTypes.EXCEPTIONAL)
         
         assert select.select([], [], [fd], 6) == ([], [], [fd])
-        assert self.clock.time == 1
+        assert self.clock.time == 100001
         
         assert select.select([fd], [], [fd], 6) == ([fd], [], [fd])
-        assert self.clock.time == 2
+        assert self.clock.time == 100002
 
     def test_select_with_no_timeout(self):
         fd = mock.MagicMock()
         
-        self.events_pool.add_future_event(3,
+        self.events_pool.add_future_event(100003,
                                           fd,
                                           SelectPatcher.EventTypes.READ)
         
         assert select.select([fd], [], []) == ([fd], [], [])
-        assert self.clock.time == 3
+        assert self.clock.time == 100003
 
     def test_select_infinite_wait(self):
         fd = mock.MagicMock()
@@ -150,15 +152,15 @@ class TestSelectPatcher(object):
     def test_fd_returned_in_multiple_lists(self):
         fd = mock.MagicMock()
         
-        self.events_pool.add_future_event(1,
+        self.events_pool.add_future_event(100001,
                                           fd,
                                           SelectPatcher.EventTypes.READ)
-        self.events_pool.add_future_event(1,
+        self.events_pool.add_future_event(100001,
                                           fd,
                                           SelectPatcher.EventTypes.WRITE)
-        self.events_pool.add_future_event(1,
+        self.events_pool.add_future_event(100001,
                                           fd,
                                           SelectPatcher.EventTypes.EXCEPTIONAL)
         
         assert select.select([fd], [fd], [fd], 6) == ([fd], [fd], [fd])
-        assert self.clock.time == 1
+        assert self.clock.time == 100001

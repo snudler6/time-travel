@@ -19,25 +19,28 @@ class TestDatetimePatcher(object):
         self.patcher.stop()
 
     def test_datetime_today(self):
-        assert datetime.datetime.today() == datetime.datetime.fromtimestamp(0)
+        assert datetime.datetime.today() == \
+            datetime.datetime.fromtimestamp(100000)
         
-        self.clock.time = 3600
-        assert datetime.datetime.today() ==\
-            datetime.datetime.fromtimestamp(3600)
+        self.clock.time = 103600
+        assert datetime.datetime.today() == \
+            datetime.datetime.fromtimestamp(103600)
             
     def test_datetime_utcnow(self):
-        assert datetime.datetime.utcnow() == datetime.datetime.fromtimestamp(0)
+        assert datetime.datetime.utcnow() == \
+            datetime.datetime.fromtimestamp(100000)
         
-        self.clock.time = 3600
-        assert datetime.datetime.utcnow() ==\
-            datetime.datetime.fromtimestamp(3600)
+        self.clock.time = 103600
+        assert datetime.datetime.utcnow() == \
+            datetime.datetime.fromtimestamp(103600)
             
     def test_datetime_now(self):
-        assert datetime.datetime.now() == datetime.datetime.fromtimestamp(0)
+        assert datetime.datetime.now() == \
+            datetime.datetime.fromtimestamp(100000)
         
-        self.clock.time = 3600
-        assert datetime.datetime.now() ==\
-            datetime.datetime.fromtimestamp(3600)
+        self.clock.time = 103600
+        assert datetime.datetime.now() == \
+            datetime.datetime.fromtimestamp(103600)
             
     def test_isinstance_works(self):
         assert isinstance(datetime.datetime.today(),

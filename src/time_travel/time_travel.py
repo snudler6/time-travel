@@ -2,7 +2,7 @@
 
 import pkg_resources
 
-from .time_machine_clock import TimeMachineClock
+from .time_machine_clock import TimeMachineClock, MIN_START_TIME
 from .events_pool import EventsPool
 
 
@@ -19,7 +19,7 @@ class TimeTravel(object):
     class EventsType(object):
         """Empty class to register events types on."""
     
-    def __init__(self, start_time=0, **kwargs):
+    def __init__(self, start_time=MIN_START_TIME, **kwargs):
         """Create the patch.
         
         @start_time is time in seconds since the epoch.
