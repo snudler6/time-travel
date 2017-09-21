@@ -4,9 +4,9 @@ from time_travel.events_pool import EventsPool
 from .utils import _t
 
 import select
+import pytest
 import mock
 import sys
-import pytest
 
 
 def sec2msec(sec):
