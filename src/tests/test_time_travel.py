@@ -2,11 +2,11 @@ from time_travel import TimeTravel
 from time_travel.patchers.tests.utils import _t
 
 import time
-from datetime import datetime
 import select
 import mock
 import pytest
 import sys
+from datetime import datetime
 from datetime import datetime as datetime_cls
 
 
