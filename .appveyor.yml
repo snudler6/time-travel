@@ -1,15 +1,17 @@
 environment:
   matrix:
+    # For Python versions available on Appveyor, see
+    # http://www.appveyor.com/docs/installed-software#python
     - PYTHON: "C:\\Python27"
-      cmd: SET TOXENV=py27
+      TOXENV: "py27"
     - PYTHON: "C:\\Python33"
-      cmd: SET TOXENV=py33
+      TOXENV: "py33"
     - PYTHON: "C:\\Python34"
-      cmd: SET TOXENV=py34
+      TOXENV: "py34"
     - PYTHON: "C:\\Python35"
-      cmd: SET TOXENV=py35
+      TOXENV: "py35"
     - PYTHON: "C:\\Python36"
-      cmd: SET TOXENV=py36
+      TOXENV: "py36"
 
 install:
   - "%PYTHON%\\python.exe -m pip install tox"
@@ -17,4 +19,4 @@ install:
 build: off
 
 test_script:
-  - "%PYTHON%\\python.exe -m tox"
+  - "%PYTHON%\\python.exe -m tox -e %TOXENV%"
