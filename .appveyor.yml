@@ -2,21 +2,25 @@ environment:
   matrix:
     # For Python versions available on Appveyor, see
     # http://www.appveyor.com/docs/installed-software#python
-    - PYTHON: "C:\\Python27"
-      TOXENV: "py27"
-    - PYTHON: "C:\\Python33"
-      TOXENV: "py33"
-    - PYTHON: "C:\\Python34"
-      TOXENV: "py34"
-    - PYTHON: "C:\\Python35"
-      TOXENV: "py35"
-    - PYTHON: "C:\\Python36"
-      TOXENV: "py36"
+    - TOXENV: "py27"
+    - TOXENV: "py33"
+    - TOXENV: "py34"
+    - TOXENV: "py35"
+    - TOXENV: "py36"
+    - TOXENV: "pypy"
 
 install:
-  - pip install tox
-  - choco install python.pypy
+  - echo Installed Pythons
+  - dir c:\Python*
+
+  # install pypy using choco (redirect to a file and write to console in case
+  # choco install returns non-zero, because choco install python.pypy is too
+  # noisy)
+  - if not exist "C:\tools\pypy\pypy" choco install python.pypy > pypy-inst.log 2>&1 || (type pypy-inst.log & exit /b 1)
   - set PATH=C:\tools\pypy\pypy;%PATH% # so tox can find pypy
+  - echo PyPy installed
+
+  - pip install tox
 
 build: off
 
