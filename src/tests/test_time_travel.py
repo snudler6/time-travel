@@ -113,8 +113,8 @@ def test_select_timeout_occurring():
         assert datetime_cls.today() == datetime_cls.fromtimestamp(now + 6)
 
 
-@pytest.mark.skipif(sys.platform == 'win32',
-                    reason='select.poll is not supported under win32')
+@pytest.mark.skipif(not hasattr(select, 'poll'),
+                    reason='select.poll is not supported in this platform')
 def test_poll():
     with TimeTravel(modules_to_patch=__name__) as t:
         fd = mock.MagicMock()
