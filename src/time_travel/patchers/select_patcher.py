@@ -36,7 +36,7 @@ class SelectPatcher(BasePatcher):
         return cls.EVENTS_NAMESPACE
     
     @classmethod
-    def get_events_types(cls):
+    def get_event_types(cls):
         """Return Enum of select events types."""
         return cls.EventTypes 
         
@@ -53,7 +53,7 @@ class SelectPatcher(BasePatcher):
             return fd in waited_fds and evt == event
 
         # fd_events is a list of [(fd, set(events)), ...].
-        ts, fd_events = self.events_pool.get_next_event(
+        ts, fd_events = self.event_pool.get_next_event(
             _is_relevant_fd_event)
 
         if ts is None or ts > timeout_timestamp:
@@ -87,13 +87,13 @@ class SelectPatcher(BasePatcher):
         write_fds = [] if timestamp < write_timestamp else write_fds
         ex_fds = [] if timestamp < ex_timestamp else ex_fds
 
-        self.events_pool.remove_events_from_fds(
+        self.event_pool.remove_events_from_fds(
             timestamp,
             [(fd, self.EventTypes.READ) for fd in read_fds])
-        self.events_pool.remove_events_from_fds(
+        self.event_pool.remove_events_from_fds(
             timestamp,
             [(fd, self.EventTypes.WRITE) for fd in write_fds])
-        self.events_pool.remove_events_from_fds(
+        self.event_pool.remove_events_from_fds(
             timestamp,
             [(fd, self.EventTypes.EXCEPTIONAL) for fd in ex_fds])
 

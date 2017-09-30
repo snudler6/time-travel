@@ -10,12 +10,12 @@ class BasePatcher(object):
     
     def __init__(self,
                  clock,
-                 events_pool=None,
+                 event_pool=None,
                  modules_to_patch=None,
                  patcher_module=None):
         """Create the patch."""
         self.clock = clock
-        self.events_pool = events_pool
+        self.event_pool = event_pool
         
         if modules_to_patch is None:
             self.modules_to_patch = []

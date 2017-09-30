@@ -10,10 +10,10 @@ import select
 class MockPollObject(object):
     """A mock poll object."""
 
-    def __init__(self, clock, events_pool):
+    def __init__(self, clock, event_pool):
         """Initialize the object."""
         self.clock = clock
-        self.events_pool = events_pool
+        self.event_pool = event_pool
 
         self.poll_events = {}
 
@@ -52,7 +52,7 @@ class MockPollObject(object):
                              'timout')
 
         for fd, events in fd_events:
-            self.events_pool.remove_events_from_fds(
+            self.event_pool.remove_events_from_fds(
                 timestamp,
                 [(fd, event) for event in events])
 
@@ -79,7 +79,7 @@ class MockPollObject(object):
             return fd in self.poll_events and self.poll_events[fd] & evt
 
         # fd_events is a list of [(fd, set(events)), ...].
-        ts, fd_events = self.events_pool.get_next_event(_is_relevant_fd_event)
+        ts, fd_events = self.event_pool.get_next_event(_is_relevant_fd_event)
 
         if ts is None or ts > timeout_timestamp:
             return timeout_timestamp, []
@@ -103,4 +103,4 @@ class PollPatcher(BasePatcher):
         return [('poll', '', select_lib.poll, self._mock_poll)]
     
     def _mock_poll(self):
-        return MockPollObject(self.clock, self.events_pool)
+        return MockPollObject(self.clock, self.event_pool)
