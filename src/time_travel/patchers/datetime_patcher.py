@@ -167,8 +167,6 @@ class DatetimePatcher(BasePatcher):
         copyreg.dispatch_table[_real_datetime] = pickle_fake_datetime
         copyreg.dispatch_table[_real_date] = pickle_fake_date
         
-        
-        
     def stop(self):
         """Return pickle behavior to normal."""
         copyreg.dispatch_table.pop(_real_datetime)

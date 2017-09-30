@@ -2,6 +2,7 @@
 
 import sys
 import mock
+import inspect
 
 
 class BasePatcher(object):
@@ -44,9 +45,9 @@ class BasePatcher(object):
         """Return list of patches to do.
         
         The list structure is tuples containgin:
-            (real_attribute_name,
-             the_real_attribue,
-             fake_attribute)
+            (real_object_name,
+             the_real_object,
+             fake_object)
         """
         raise NotImplementedError()
         
@@ -83,21 +84,22 @@ class BasePatcher(object):
         real_id_to_fake = {id(real): fake for _, real, fake in patch_actions}
         
         patched_module = self.get_patched_module()
-        for real_name, real_attr, fake_attr in patch_actions:
-            self._save_for_undo(patched_module, real_name, real_attr)
-            setattr(patched_module, real_name, fake_attr)
+        
+        # Change modules for later imports.
+        for obj_name, real_obj, fake_obj in patch_actions:
+            self._save_for_undo(patched_module, obj_name, real_obj)
+            setattr(patched_module, obj_name, fake_obj)
             
-        # Create the list of all modules to search for datetime and date
-        # classes.
         if self.modules_to_patch:
             # If only a given list of modules is required to be patched
             modules = [sys.modules[name] for name in self.modules_to_patch] 
         else:
-            # Patch on all loaded modules
+            # not given a specific module to patch on.
+            # Create the list of all modules to search for the patched objects.
+            # Patch on all loaded modules.
             modules = [
                 module for mod_name, module in sys.modules.items() if
-                mod_name is not None and
-                module is not None and
+                inspect.ismodule(module) and
                 hasattr(module, '__name__') and
                 # Don't patch inside this module,
                 # or inside the original module.
@@ -105,6 +107,7 @@ class BasePatcher(object):
                                          __name__]) 
             ]
         
+        # Search in all modules for the object to patch.
         for module in modules:
             for attr in dir(module):
                 try:
@@ -112,6 +115,7 @@ class BasePatcher(object):
                     attribute_value = getattr(module, attr)
                 except (ValueError, AttributeError, ImportError):
                     # For some libraries, this happen.
+                    # e.g. attr=dbm_gnu, module=pkg_resources._vendor.six.moves
                     continue
                 
                 # If the attribute is on this module - avoid recursion.
@@ -120,9 +124,9 @@ class BasePatcher(object):
                     continue
                     
                 # Find the relative mock object for the original class.
-                fake = real_id_to_fake.get(id(attribute_value))
+                fake_obj = real_id_to_fake.get(id(attribute_value))
                 # Change the class to the mocked one in the given module.
-                setattr(module, attr, fake)
+                setattr(module, attr, fake_obj)
                 # Save the original class for later - when stopping the patch.
                 self._save_for_undo(module, attr, attribute_value)
                 
