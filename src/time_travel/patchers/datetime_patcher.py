@@ -184,15 +184,21 @@ class DatetimePatcher(BasePatcher):
             ('datetime', _real_datetime, FakeDatetime)
         ]
         
-    def start_extra_actions(self):
+    def start(self):
         """Change pickle function for datetime to handle mocked datetime."""
+        super(DatetimePatcher, self).start()
+        
         copyreg.dispatch_table[_real_datetime] = pickle_fake_datetime
         copyreg.dispatch_table[_real_date] = pickle_fake_date
         
-    def stop_extra_actions(self):
+        
+        
+    def stop(self):
         """Return pickle behavior to normal."""
         copyreg.dispatch_table.pop(_real_datetime)
         copyreg.dispatch_table.pop(_real_date)
+        
+        super(DatetimePatcher, self).stop()
             
     def _now(self):
         return _real_datetime.fromtimestamp(self.clock.time)

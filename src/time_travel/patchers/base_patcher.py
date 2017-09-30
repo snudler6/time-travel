@@ -50,14 +50,6 @@ class BasePatcher(object):
         """
         raise NotImplementedError()
         
-    def start_extra_actions(self):
-        """Extra actions when starting the patcher."""
-        pass
-        
-    def stop_extra_actions(self):
-        """Extra actions when stoping the patcher."""
-        pass
-    
     def start(self):
         """Start the patcher."""
         patch_actions = self.get_patch_actions()
@@ -70,8 +62,6 @@ class BasePatcher(object):
             self._save_for_undo(patched_module, real_name, real_attr)
             setattr(patched_module, real_name, fake_attr)
             
-        self.start_extra_actions()
-
         # Create the list of all modules to search for datetime and date
         # classes.
         if self.modules_to_patch:
@@ -118,7 +108,5 @@ class BasePatcher(object):
             
         self._undo_set.clear()
         
-        self.stop_extra_actions()
-                
     def _save_for_undo(self, module, attribute, original_value):
         self._undo_set.add((module, attribute, original_value))
