@@ -5,42 +5,37 @@ from .utils import _t
 import time
 
 
-def test_time_patch():
-    clock = TimeMachineClock()
+class TestTimePatcher(object):
     
-    patcher = TimePatcher(clock)
-    patcher.start()
+    def setup_method(self, method):
+        """Start a time patcher."""
+        self.clock = TimeMachineClock()
     
-    assert time.time() == _t(0)
-    clock.time = _t(3600)
-    assert time.time() == _t(3600)
-    
-    patcher.stop()
-
-
-def test_sleep_patch():
-    clock = TimeMachineClock()
-    
-    patcher = TimePatcher(clock)
-    patcher.start()
-
-    assert time.time() == _t(0)
-    time.sleep(3600)
-    assert time.time() == _t(3600)
-    
-    clock.time = _t(7200)
-    assert time.time() == _t(7200)
-
-    patcher.stop()
-
+        self.patcher = TimePatcher(clock=self.clock,
+                                   modules_to_patch=__name__)
+        self.patcher.start()
         
-def test_patcher_stop():
-    clock = TimeMachineClock()
-    patcher = TimePatcher(clock)
-    patcher.start()
+    def teardown_method(self, method):
+        """Stop the datetime patcher"""
+        self.patcher.stop()
+
+    def test_time_patch(self):
+        
+        assert time.time() == _t(0)
+        self.clock.time = _t(3600)
+        assert time.time() == _t(3600)
     
-    assert time.time() == _t(0)
-    
-    patcher.stop()
-    
-    assert time.time() != _t(0)
+    def test_sleep_patch(self):
+        assert time.time() == _t(0)
+        time.sleep(3600)
+        assert time.time() == _t(3600)
+        
+        self.clock.time = _t(7200)
+        assert time.time() == _t(7200)
+            
+    def test_patcher_stop(self):
+        assert time.time() == _t(0)
+        
+        self.patcher.stop()
+        
+        assert time.time() != _t(0)

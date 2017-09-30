@@ -24,7 +24,7 @@ Modifications to the file was to leave the patching of datetime libray only,
 and remove any other patching or any other advanced logic.
 """
 
-from .basic_patcher import BasePatcher
+from .base_patcher import BasePatcher
 
 import sys
 import datetime
@@ -167,88 +167,30 @@ class DatetimePatcher(BasePatcher):
     
     def __init__(self, **kwargs):
         """Create the patch."""
-        super(DatetimePatcher, self).__init__(**kwargs)
+        super(DatetimePatcher, self).__init__(patcher_module=__name__,
+                                              **kwargs)
         
         FakeDate._now = self._now
         FakeDatetime._now = self._now
         
-        self._undo_set = set()
+    def get_patched_module(self):
+        """Do more stuff."""
+        return datetime
         
-    def start(self):
-        """Start the patch of datetime.datetime class.
+    def get_patch_actions(self):
+        """Do stuff."""
+        yield ('date', '_real_date', _real_date, FakeDate)
+        yield ('datetime', '_real_datetime', _real_datetime, FakeDatetime)
         
-        This method overrides the method of the basic patcher.
-        """
-        datetime.datetime = FakeDatetime
-        datetime.date = FakeDate
-        
-        # Change pickle function for datetime to handle mocked datetime.
+    def start_extra_actions(self):
+        """Change pickle function for datetime to handle mocked datetime."""
         copyreg.dispatch_table[_real_datetime] = pickle_fake_datetime
         copyreg.dispatch_table[_real_date] = pickle_fake_date
         
-        to_patch = (
-            # (local_name, orig_local_class, fake_name, fake_class)
-            ('_real_date', _real_date, 'FakeDate', FakeDate),
-            ('_real_datetime', _real_datetime, 'FakeDatetime', FakeDatetime),
-        )
-        
-        local_names = tuple(real_name for real_name, _, _, _ in to_patch)
-        real_id_to_fake = {id(real): fake for _, real, _, fake in to_patch}
-
-        # Create the list of all modules to search for datetime and date
-        # classes.
-        if self.modules_to_patch:
-            # If only a given list of modules is required to be patched
-            modules = [sys.modules[name] for name in self.modules_to_patch] 
-        else:
-            # Patch on all loaded modules
-            modules = [
-                module for mod_name, module in sys.modules.items() if
-                mod_name is not None and
-                module is not None and
-                hasattr(module, '__name__') and
-                # Don't patch inside this module,
-                # or inside the original module.
-                module.__name__ not in ('datetime', __name__) 
-            ]
-        
-        for module in modules:
-            for attr in dir(module):
-                try:
-                    # Get any attribute loaded on the module.
-                    attribute_value = getattr(module, attr)
-                except (ValueError, AttributeError, ImportError):
-                    # For some libraries, this happen.
-                    continue
-                
-                # If the attribute is on this module - avoid recursion.
-                # Do stuff only if the attribute is datetime or date classes.
-                if attr in local_names or \
-                        id(attribute_value) not in real_id_to_fake.keys():
-                    continue
-                    
-                # Find the relative mock object for the original class.
-                fake = real_id_to_fake.get(id(attribute_value))
-                # Change the class to the mocked one in the given module.
-                setattr(module, attr, fake)
-                # Save the original class for later - when stopping the patch.
-                self._save_for_undo(module, attr, attribute_value)
-                
-    def stop(self):
-        """Stop the patching of datetime module."""
-        datetime.date = _real_date
-        datetime.datetime = _real_datetime
-        
-        for module, attribute, original_value in self._undo_set:
-            setattr(module, attribute, original_value)
-            
-        self._undo_set.clear()
-        
+    def stop_extra_actions(self):
+        """Return pickle behavior to normal."""
         copyreg.dispatch_table.pop(_real_datetime)
         copyreg.dispatch_table.pop(_real_date)
-                
-    def _save_for_undo(self, module, attribute, original_value):
-        self._undo_set.add((module, attribute, original_value))
-    
+            
     def _now(self):
         return _real_datetime.fromtimestamp(self.clock.time)

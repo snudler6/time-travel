@@ -3,6 +3,7 @@
 from .base_patcher import BasePatcher
 
 import mock
+import time
 
 
 class TimePatcher(BasePatcher):
@@ -13,14 +14,20 @@ class TimePatcher(BasePatcher):
         - sleep
     """
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         """Create the patch."""
-        super(TimePatcher, self).__init__(*args, **kwargs)
+        super(TimePatcher, self).__init__(patcher_module=__name__, **kwargs)
         
-    def get_patches(self):
+    def get_patched_module(self):
+        """Do more stuff."""
+        return time
+        
+    def get_patch_actions(self):
         """Return generator containing all patches to do."""
-        yield ('time.time', mock.Mock(side_effect=self._get_timestamp))
-        yield ('time.sleep', mock.Mock(side_effect=self._advance_time_stamp))
+        yield ('time', '', time.time,
+               mock.Mock(side_effect=self._get_timestamp))
+        yield ('sleep', '', time.sleep,
+               mock.Mock(side_effect=self._advance_time_stamp))
     
     def _get_timestamp(self):
         """Return the clock timestamp.
