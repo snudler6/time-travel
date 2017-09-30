@@ -4,8 +4,8 @@ from select import select
 from datetime import datetime
   
 
-def wait_and_response(socket):
-    """Wait for a message for 50 min and respond the current to it."""
+def wait_and_respond(socket):
+    """Wait for a message for 50 min and respond the current time to it."""
     r_fds, _, _ = select([socket], [], [], 50 * 60)
     
     if not r_fds:

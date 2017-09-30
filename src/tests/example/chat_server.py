@@ -1,4 +1,4 @@
-# Socket server in python using select function
+"""Socket server in python using select function."""
  
 import socket
 import functools
@@ -13,6 +13,7 @@ class ChatServer(object):
     
     @staticmethod
     def _chat_callback(socket):
+        """Recieve message from client and send to the others."""
         message = socket.recv()
         
         if not message:
@@ -30,6 +31,7 @@ class ChatServer(object):
        
     @staticmethod     
     def _chat_send_callback(socket):
+        """Send a message to a client."""
         if socket not in ChatServer.clients_list:
             # Client was removed.
             return
@@ -41,11 +43,11 @@ class ChatServer(object):
         
         socket.send(msg)
             
-    
     class RegisterSocket(socket.socket):
-        """Callback socket for registration"""
+        """Callback socket for registration."""
         
-        def callback(self):
+        def _chat_callback(self):
+            """Register a new cclient."""
             sockfd, addr = self.accept()            
             ChatServer.clients_list.append(sockfd)
             sockfd._chat_callback = functools.partial(
@@ -55,27 +57,26 @@ class ChatServer(object):
                 ChatServer._chat_send_callback,
                 sockfd)
             
-            
-    def main_loop(self, server_socket):
-        recv_sockets = self.clients_list + [server_socket]
-        send_socket = self.outgoing_messages.keys()
-        r_fds, w_fds, _ = select(recv_sockets, send_socket, [])
-        
-        for fd in r_fds:
-            fd._chat_callback()
-            
-        for fd in w_fds:
-            fd._chat_send_callback() 
-            
     def run(self):
+        """Run the chat server."""
         PORT = 5000
              
         server_socket = RegisterSocket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(("0.0.0.0", PORT))
         server_socket.listen(10)
         
-        while True:
-            main_loop(server_socket)
+        # Recieve the first client.
+        server_socket._chat_callback()
+        
+        while self.clients_list:
+            recv_sockets = self.clients_list + [server_socket]
+            send_socket = self.outgoing_messages.keys()
+            r_fds, w_fds, _ = select(recv_sockets, send_socket, [])
+            
+            for fd in r_fds:
+                fd._chat_callback()
+                
+            for fd in w_fds:
+                fd._chat_send_callback() 
             
         server_socket.close()
-        

@@ -19,7 +19,7 @@ def test_basic_behaviour():
         wait_and_response(socket)
         
         from datetime import datetime
-        socket.write.assert_called_once_with(
+        socket.send.assert_called_once_with(
             str(datetime.fromtimestamp(t.clock.time)))
         
         
@@ -33,7 +33,7 @@ def test_really_long_wait():
         wait_and_response(socket)
         
         from datetime import datetime
-        socket.write.assert_called_once_with(
+        socket.send.assert_called_once_with(
             str(datetime.fromtimestamp(t.clock.time)))
 
         
