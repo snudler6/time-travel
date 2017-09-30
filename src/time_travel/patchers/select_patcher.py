@@ -1,13 +1,13 @@
 """A patch to the select.select function."""
 
-from .basic_patcher import BasicPatcher
+from .base_patcher import BasePatcher
 
 import select as select_lib
 from enum import Enum
 import mock
 
 
-class SelectPatcher(BasicPatcher):
+class SelectPatcher(BasePatcher):
     """Patcher for select.select."""
     
     EVENTS_NAMESPACE = 'select'
@@ -21,7 +21,9 @@ class SelectPatcher(BasicPatcher):
             side_effect=self._mocked_select,
             spec=select_lib.select)
         
-        self.patches = [mock.patch('select.select', self.select)]
+    def get_patches(self):
+        """Return generator containing all patches to do."""
+        yield ('select.select', self.select)
         
     @classmethod
     def get_events_namespace(cls):

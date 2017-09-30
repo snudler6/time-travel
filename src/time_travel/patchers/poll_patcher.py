@@ -1,6 +1,6 @@
 """A patch to the select.poll object."""
 
-from .basic_patcher import BasicPatcher
+from .base_patcher import BasePatcher
 
 import select as select_lib
 import mock
@@ -86,14 +86,16 @@ class MockPollObject(object):
             return ts, fd_events
 
 
-class PollPatcher(BasicPatcher):
+class PollPatcher(BasePatcher):
     """Patcher for select.poll."""
     
     def __init__(self, *args, **kwargs):
         """Create the patch."""
         super(PollPatcher, self).__init__(*args, **kwargs)
 
-        self.patches = [mock.patch('select.poll', self._mock_poll)]
+    def get_patches(self):
+        """Return generator containing all patches to do."""
+        yield (mock.patch('select.poll', self._mock_poll))
     
     def _mock_poll(self):
         return MockPollObject(self.clock, self.events_pool)
