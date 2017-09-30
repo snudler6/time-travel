@@ -6,12 +6,12 @@ class BasicPatcher(object):
     
     def __init__(self,
                  clock,
-                 events_pool=None,
+                 event_pool=None,
                  modules_to_patch=None,
                  **kwargs):
         """Create the patch."""
         self.clock = clock
-        self.events_pool = events_pool
+        self.event_pool = event_pool
         
         if modules_to_patch is None:
             self.modules_to_patch = []
@@ -28,7 +28,7 @@ class BasicPatcher(object):
         return None
     
     @classmethod
-    def get_events_types(cls):
+    def get_event_types(cls):
         """Return Enum of the patcher's events types."""
         return None
                 

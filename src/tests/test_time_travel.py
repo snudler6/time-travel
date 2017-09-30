@@ -79,41 +79,38 @@ def test_sleep_changing_datetime_now():
 
 def test_select_no_timeout():
     with TimeTravel(modules_to_patch=__name__) as t:
-        event = mock.MagicMock()
+        fd = mock.MagicMock()
         
-        t.events_pool.add_future_event(_t(2),
-                                       event,
-                                       t.events_types.select.WRITE)
-        
-        assert select.select([], [event], []) == ([], [event], [])
-        assert time.time() == _t(2)
-        assert datetime_cls.today() == datetime_cls.fromtimestamp(_t(2))
+        t.add_future_event(2, fd, t.event_types.select.WRITE)
+
+        now = t.clock.time
+        assert select.select([], [fd], []) == ([], [fd], [])
+        assert time.time() == now + 2
+        assert datetime_cls.today() == datetime_cls.fromtimestamp(now + 2)
       
         
 def test_select_with_timeout():
     with TimeTravel(modules_to_patch=__name__) as t:
-        event = mock.MagicMock()
+        fd = mock.MagicMock()
         
-        t.events_pool.add_future_event(_t(2),
-                                       event,
-                                       t.events_types.select.EXCEPTIONAL)
-        
-        assert select.select([], [], [event], 6) == ([], [], [event])
-        assert time.time() == _t(2)
-        assert datetime_cls.today() == datetime_cls.fromtimestamp(_t(2))
+        t.add_future_event(2, fd, t.event_types.select.EXCEPTIONAL)
+
+        now = t.clock.time
+        assert select.select([], [], [fd], 6) == ([], [], [fd])
+        assert time.time() == now + 2
+        assert datetime_cls.today() == datetime_cls.fromtimestamp(now + 2)
      
         
 def test_select_timeout_occurring():
     with TimeTravel(modules_to_patch=__name__) as t:
-        event = mock.MagicMock()
+        fd = mock.MagicMock()
         
-        t.events_pool.add_future_event(_t(10),
-                                       event,
-                                       t.events_types.select.READ)
-        
-        assert select.select([event], [], [], 6) == ([], [], [])
-        assert time.time() == _t(6)
-        assert datetime_cls.today() == datetime_cls.fromtimestamp(_t(6))
+        t.add_future_event(10, fd, t.event_types.select.READ)
+
+        now = t.clock.time
+        assert select.select([fd], [], [], 6) == ([], [], [])
+        assert time.time() == now + 6
+        assert datetime_cls.today() == datetime_cls.fromtimestamp(now + 6)
 
 
 @pytest.mark.skipif(sys.platform == 'win32',
@@ -121,10 +118,11 @@ def test_select_timeout_occurring():
 def test_poll():
     with TimeTravel(modules_to_patch=__name__) as t:
         fd = mock.MagicMock()
-        t.events_pool.add_future_event(_t(2), fd, select.POLLIN)
+        t.add_future_event(2, fd, select.POLLIN)
 
         poll = select.poll()
         poll.register(fd, select.POLLIN | select.POLLOUT)
 
+        now = t.clock.time
         assert poll.poll() == [(fd, select.POLLIN)]
-        assert time.time() == _t(2)
+        assert time.time() == now + 2
