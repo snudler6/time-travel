@@ -80,8 +80,7 @@ class BasePatcher(object):
         """
         patch_actions = self.get_patch_actions()
         
-        real_id_to_fake = {id(real): fake for _, real, fake in
-                           patch_actions}
+        real_id_to_fake = {id(real): fake for _, real, fake in patch_actions}
         
         patched_module = self.get_patched_module()
         for real_name, real_attr, fake_attr in patch_actions:
