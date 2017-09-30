@@ -142,7 +142,7 @@ class DatetimePatcher(BasePatcher):
     """
     
     def __init__(self, **kwargs):
-        """Create the patch."""
+        """Create the patcher."""
         super(DatetimePatcher, self).__init__(patcher_module=__name__,
                                               **kwargs)
         

@@ -12,6 +12,7 @@ class TestTimePatcher(object):
         self.clock = TimeMachineClock()
     
         self.patcher = TimePatcher(clock=self.clock,
+                                   event_pool=None,
                                    modules_to_patch=__name__)
         self.patcher.start()
         

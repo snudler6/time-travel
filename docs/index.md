@@ -125,7 +125,7 @@ setup(
 
 The class should do 1 of 2 things:
 
-1. Implement it's own `start` and `stop` of the patcher
+1. Override and implement it's own `start` and `stop` of the patcher.
 2. Inherit BasePatcher, Implement `get_patched_module` and `get_patch_actions`:
    * `get_patched_module` return the actual module patched by the patcher.
    * `get_patch_actions` return a list containing 

@@ -12,6 +12,7 @@ class TestDatetimePatcher(object):
         """Start a datetime patcher."""
         self.clock = TimeMachineClock()
         self.patcher = DatetimePatcher(clock=self.clock,
+                                       event_pool=None,
                                        modules_to_patch=__name__)
         self.patcher.start()
         

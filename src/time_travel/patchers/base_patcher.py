@@ -10,7 +10,7 @@ class BasePatcher(object):
     
     def __init__(self,
                  clock,
-                 event_pool=None,
+                 event_pool,
                  modules_to_patch=None,
                  patcher_module=None):
         """Create the patch."""
@@ -44,7 +44,7 @@ class BasePatcher(object):
     def get_patch_actions(self):
         """Return list of the patches to do.
         
-        The list structure is tuples containgin:
+        The list structure is tuples containing:
             (real_object_name,
              the_real_object,
              fake_object)
@@ -103,7 +103,8 @@ class BasePatcher(object):
                 hasattr(module, '__name__') and
                 # Don't patch inside this module,
                 # or inside the original module.
-                module.__name__ not in ([patched_module, self.patcher_module,
+                module.__name__ not in ([patched_module,
+                                         self.patcher_module,
                                          __name__]) 
             ]
         
