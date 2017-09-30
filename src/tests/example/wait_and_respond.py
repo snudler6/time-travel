@@ -12,4 +12,4 @@ def wait_and_respond(socket):
         raise ValueError("No one connected for 50 minutes.")
     
     _, w_fds, _ = select([], [socket], [])
-    w_fds[0].write(str(datetime.today()))
+    w_fds[0].send(str(datetime.today()))
