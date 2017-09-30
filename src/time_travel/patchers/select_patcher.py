@@ -4,7 +4,6 @@ from .base_patcher import BasePatcher
 
 import select as select_lib
 from enum import Enum
-import mock
 
 
 class SelectPatcher(BasePatcher):
@@ -17,13 +16,9 @@ class SelectPatcher(BasePatcher):
         """Create the patch."""
         super(SelectPatcher, self).__init__(*args, **kwargs)
         
-        self.select = mock.Mock(
-            side_effect=self._mocked_select,
-            spec=select_lib.select)
-        
     def get_patch_actions(self):
         """Return generator containing all patches to do."""
-        return [('select', select_lib.select, self.select)]
+        return [('select', select_lib.select, self._mocked_select)]
         
     def get_patched_module(self):
         """Return the actual module obect to be patched."""

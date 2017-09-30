@@ -1,7 +1,6 @@
 """Base class for patching time modules."""
 
 import sys
-import mock
 import inspect
 
 

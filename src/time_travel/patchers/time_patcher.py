@@ -2,7 +2,6 @@
 
 from .base_patcher import BasePatcher
 
-import mock
 import time
 
 
@@ -25,9 +24,8 @@ class TimePatcher(BasePatcher):
     def get_patch_actions(self):
         """Return generator containing all patches to do."""
         return [
-            ('time', time.time, mock.Mock(side_effect=self._get_timestamp)),
-            ('sleep', time.sleep,
-             mock.Mock(side_effect=self._advance_time_stamp))
+            ('time', time.time, self._get_timestamp),
+            ('sleep', time.sleep, self._advance_time_stamp)
         ]
     
     def _get_timestamp(self):

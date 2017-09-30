@@ -3,7 +3,6 @@
 from .base_patcher import BasePatcher
 
 import select as select_lib
-import mock
 
 
 class MockPollObject(object):
