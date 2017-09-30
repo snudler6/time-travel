@@ -43,7 +43,14 @@ class BasePatcher(object):
         raise NotImplementedError()
         
     def get_patch_actions(self):
-        """Do stuff."""
+        """Return list of patches to do.
+        
+        The list structure is tuples containgin:
+            (real_attribute_name,
+             local_attribute_name,
+             the_real_attribue,
+             fake_attribute)
+        """
         raise NotImplementedError()
         
     def start_extra_actions(self):
@@ -98,7 +105,8 @@ class BasePatcher(object):
                 
                 # If the attribute is on this module - avoid recursion.
                 # Do stuff only if the attribute is datetime or date classes.
-                if id(attribute_value) not in real_id_to_fake.keys():
+                if attr in local_names or \
+                        id(attribute_value) not in real_id_to_fake.keys():
                     continue
                     
                 # Find the relative mock object for the original class.

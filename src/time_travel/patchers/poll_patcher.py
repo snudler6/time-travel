@@ -93,9 +93,13 @@ class PollPatcher(BasePatcher):
         """Create the patch."""
         super(PollPatcher, self).__init__(*args, **kwargs)
 
-    def get_patches(self):
+    def get_patched_module(self):
+        """Do more stuff."""
+        return select
+        
+    def get_patch_actions(self):
         """Return generator containing all patches to do."""
-        yield (mock.patch('select.poll', self._mock_poll))
+        return ['poll', '', select_lib.poll, self._mock_poll]
     
     def _mock_poll(self):
         return MockPollObject(self.clock, self.events_pool)

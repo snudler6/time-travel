@@ -179,8 +179,10 @@ class DatetimePatcher(BasePatcher):
         
     def get_patch_actions(self):
         """Do stuff."""
-        yield ('date', '_real_date', _real_date, FakeDate)
-        yield ('datetime', '_real_datetime', _real_datetime, FakeDatetime)
+        return [
+            ('date', '_real_date', _real_date, FakeDate),
+            ('datetime', '_real_datetime', _real_datetime, FakeDatetime)
+        ]
         
     def start_extra_actions(self):
         """Change pickle function for datetime to handle mocked datetime."""

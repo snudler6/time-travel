@@ -5,6 +5,7 @@ from .base_patcher import BasePatcher
 import select as select_lib
 from enum import Enum
 import mock
+import select
 
 
 class SelectPatcher(BasePatcher):
@@ -21,9 +22,13 @@ class SelectPatcher(BasePatcher):
             side_effect=self._mocked_select,
             spec=select_lib.select)
         
-    def get_patches(self):
+    def get_patch_actions(self):
         """Return generator containing all patches to do."""
-        yield ('select.select', self.select)
+        return [('select', '', select.select, self.select)]
+        
+    def get_patched_module(self):
+        """Do stuff."""
+        return select_lib
         
     @classmethod
     def get_events_namespace(cls):
