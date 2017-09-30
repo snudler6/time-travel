@@ -17,6 +17,7 @@ class TestSelectPatcher(object):
         self.clock = TimeMachineClock(clock_listeners=[self.events_pool])
         
         self.patcher = SelectPatcher(self.clock, self.events_pool)
+        
         self.patcher.start()
     
     def teardown_method(self, method):
