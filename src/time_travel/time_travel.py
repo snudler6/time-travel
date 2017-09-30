@@ -3,7 +3,7 @@
 import pkg_resources
 
 from .time_machine_clock import TimeMachineClock, MIN_START_TIME
-from .events_pool import EventsPool
+from .event_pool import EventPool
 
 
 class TimeTravel(object):
@@ -13,7 +13,7 @@ class TimeTravel(object):
       corresponiding to the time_machine_clock interface
       
     - For setting events for event based libraies (i.e. select) use the
-      events_pool object corresponding to the events_pool interface.
+      event_pool object corresponding to the event_pool interface.
     """
     
     class EventsType(object):
@@ -24,15 +24,15 @@ class TimeTravel(object):
         
         @start_time is time in seconds since the epoch.
         """
-        self.events_pool = EventsPool()
-        self.clock = TimeMachineClock(start_time, [self.events_pool])
+        self.event_pool = EventPool()
+        self.clock = TimeMachineClock(start_time, [self.event_pool])
 
         patches = [] 
         for patcher in pkg_resources.iter_entry_points(
                 group='time_travel.patchers'):
             patches.append(patcher.load())
 
-        self.patches = [patcher(clock=self.clock, events_pool=self.events_pool,
+        self.patches = [patcher(clock=self.clock, event_pool=self.event_pool,
                                 **kwargs)
                         for patcher in patches]
         

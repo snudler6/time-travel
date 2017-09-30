@@ -81,9 +81,9 @@ def test_select_no_timeout():
     with TimeTravel(modules_to_patch=__name__) as t:
         event = mock.MagicMock()
         
-        t.events_pool.add_future_event(_t(2),
-                                       event,
-                                       t.events_types.select.WRITE)
+        t.event_pool.add_future_event(_t(2),
+                                      event,
+                                      t.events_types.select.WRITE)
         
         assert select.select([], [event], []) == ([], [event], [])
         assert time.time() == _t(2)
@@ -94,9 +94,9 @@ def test_select_with_timeout():
     with TimeTravel(modules_to_patch=__name__) as t:
         event = mock.MagicMock()
         
-        t.events_pool.add_future_event(_t(2),
-                                       event,
-                                       t.events_types.select.EXCEPTIONAL)
+        t.event_pool.add_future_event(_t(2),
+                                      event,
+                                      t.events_types.select.EXCEPTIONAL)
         
         assert select.select([], [], [event], 6) == ([], [], [event])
         assert time.time() == _t(2)
@@ -107,9 +107,9 @@ def test_select_timeout_occurring():
     with TimeTravel(modules_to_patch=__name__) as t:
         event = mock.MagicMock()
         
-        t.events_pool.add_future_event(_t(10),
-                                       event,
-                                       t.events_types.select.READ)
+        t.event_pool.add_future_event(_t(10),
+                                      event,
+                                      t.events_types.select.READ)
         
         assert select.select([event], [], [], 6) == ([], [], [])
         assert time.time() == _t(6)
@@ -121,7 +121,7 @@ def test_select_timeout_occurring():
 def test_poll():
     with TimeTravel(modules_to_patch=__name__) as t:
         fd = mock.MagicMock()
-        t.events_pool.add_future_event(_t(2), fd, select.POLLIN)
+        t.event_pool.add_future_event(_t(2), fd, select.POLLIN)
 
         poll = select.poll()
         poll.register(fd, select.POLLIN | select.POLLOUT)

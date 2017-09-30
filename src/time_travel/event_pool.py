@@ -1,18 +1,18 @@
-"""A single event pool for all patchers."""
+"""A utility class that holds I/O events and their expiration time."""
 
 
-class EventsPool(object):
+class EventPool(object):
     """Events set for handling patches of event derived libraries.
 
     The pool contains a dictionary that for each second since epoc holds
     file descriptors and the events that will occur for them.
     The dictionary's format is as follows:
-      self.future_events = {timestamp: {fd: set(event, ...), ...}}
+      self._future_events = {timestamp: {fd: set(event, ...), ...}}
     """
 
     def __init__(self):
         """Initialise an event pool."""
-        self.future_events = {}
+        self._future_events = {}
         
     def add_future_event(self, timestamp, fd, event):
         """Add an event to a given timestamp.
@@ -22,7 +22,7 @@ class EventsPool(object):
               a patched event waiting function will be waiting on.
         - event: any object the relevant patcher will filter by.
         """
-        ts_dict = self.future_events.setdefault(timestamp, dict())
+        ts_dict = self._future_events.setdefault(timestamp, dict())
         fd_set = ts_dict.setdefault(fd, set())
         fd_set.add(event)
         
@@ -55,7 +55,7 @@ class EventsPool(object):
             return out
 
         filtered_events = []
-        for timestamp, ts_dict in self.future_events.items():
+        for timestamp, ts_dict in self._future_events.items():
             filtered_events_for_ts = _filter(ts_dict)
             if filtered_events_for_ts:
                 filtered_events.append((timestamp, filtered_events_for_ts))
@@ -76,8 +76,8 @@ class EventsPool(object):
         After a time has change, the pool can get rid of events, already
         happened but no called in any patch.
         """
-        self.future_events = {k: v for k, v in self.future_events.items()
-                              if k >= timestamp}
+        self._future_events = {k: v for k, v in self._future_events.items()
+                               if k >= timestamp}
         
     def remove_event_from_fd(self, timestamp, fd, event):
         """Remove a single event for a single fd from a single timestamp.
@@ -88,13 +88,13 @@ class EventsPool(object):
         If the timestamp has no more fd entries in it after the removal -
         removes the timestamp from `future_events`.
         """
-        self.future_events[timestamp][fd].remove(event)
+        self._future_events[timestamp][fd].remove(event)
 
-        if not self.future_events[timestamp][fd]:
-            self.future_events[timestamp].pop(fd)
+        if not self._future_events[timestamp][fd]:
+            self._future_events[timestamp].pop(fd)
 
-        if not self.future_events[timestamp]:
-            self.future_events.pop(timestamp)
+        if not self._future_events[timestamp]:
+            self._future_events.pop(timestamp)
 
     def remove_events_from_fds(self, timestamp, fd_events):
         """Remove a list of [(fd, event), ...] from a single timestamp."""
