@@ -1,5 +1,4 @@
-"""Test wait and response method."""
-
+"""Test the wait_and_respond function."""
 
 import mock
 import pytest
