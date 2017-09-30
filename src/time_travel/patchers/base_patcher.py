@@ -119,7 +119,7 @@ class BasePatcher(object):
                     continue
                 
                 # If the attribute is on this module - avoid recursion.
-                # Do stuff only if the attribute is datetime or date classes.
+                # Do stuff only if the attribute is the object to patch.
                 if id(attribute_value) not in real_id_to_fake.keys():
                     continue
                     
@@ -131,7 +131,7 @@ class BasePatcher(object):
                 self._save_for_undo(module, attr, attribute_value)
                 
     def stop(self):
-        """Stop the patching of datetime module."""
+        """Stop the patching."""
         for module, attribute, original_value in self._undo_set:
             setattr(module, attribute, original_value)
             
