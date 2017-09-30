@@ -38,11 +38,11 @@ class BasePatcher(object):
         return None
     
     def get_patched_module(self):
-        """Do more stuff."""
+        """Return the actual module obect to be patched."""
         raise NotImplementedError()
         
     def get_patch_actions(self):
-        """Return list of patches to do.
+        """Return list of the patches to do.
         
         The list structure is tuples containgin:
             (real_object_name,

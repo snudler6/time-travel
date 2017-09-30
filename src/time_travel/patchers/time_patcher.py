@@ -19,7 +19,7 @@ class TimePatcher(BasePatcher):
         super(TimePatcher, self).__init__(patcher_module=__name__, **kwargs)
         
     def get_patched_module(self):
-        """Do more stuff."""
+        """Return list of the patches to do."""
         return time
         
     def get_patch_actions(self):

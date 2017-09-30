@@ -150,11 +150,11 @@ class DatetimePatcher(BasePatcher):
         FakeDatetime._now = self._now
         
     def get_patched_module(self):
-        """Do more stuff."""
+        """Return the actual module obect to be patched."""
         return datetime
         
     def get_patch_actions(self):
-        """Do stuff."""
+        """Return list of the patches to do."""
         return [
             ('date', _real_date, FakeDate),
             ('datetime', _real_datetime, FakeDatetime)

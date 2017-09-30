@@ -4,7 +4,6 @@ from .base_patcher import BasePatcher
 
 import select as select_lib
 import mock
-import select
 
 
 class MockPollObject(object):
@@ -96,7 +95,7 @@ class PollPatcher(BasePatcher):
 
     def get_patched_module(self):
         """Do more stuff."""
-        return select
+        return select_lib
         
     def get_patch_actions(self):
         """Return generator containing all patches to do."""
