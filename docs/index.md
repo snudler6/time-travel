@@ -122,3 +122,27 @@ setup(
     }
 )
 ```
+
+The class should do 1 of 2 things:
+
+1. Override and implement it's own `start` and `stop` of the patcher.
+2. Inherit BasePatcher, Implement `get_patched_module` and `get_patch_actions`:
+   * `get_patched_module` return the actual module patched by the patcher.
+   * `get_patch_actions` return a list containing 
+     `(object_name, the_real_object, fake_object)`
+     where the object name is the object's name in the patched module and it
+     will be replaced by the fake object.
+     e.g.:
+
+```python
+
+from time_travel.patchers import BasePatcher
+import time
+
+class TimePatcher(BasePatcher):
+    def get_patched_module(self):
+        return time
+        
+    def get_patch_actions(self):
+        return [('time', time.time, lambda: return 0)]
+```

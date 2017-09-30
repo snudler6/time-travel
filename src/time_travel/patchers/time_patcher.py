@@ -1,11 +1,11 @@
 """A patch to the time module."""
 
-from .basic_patcher import BasicPatcher
+from .base_patcher import BasePatcher
 
-import mock
+import time
 
 
-class TimePatcher(BasicPatcher):
+class TimePatcher(BasePatcher):
     """Patcher of the time module.
     
     Patching:
@@ -13,15 +13,20 @@ class TimePatcher(BasicPatcher):
         - sleep
     """
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         """Create the patch."""
-        super(TimePatcher, self).__init__(*args, **kwargs)
+        super(TimePatcher, self).__init__(patcher_module=__name__, **kwargs)
         
-        self.patches.append(
-            mock.patch('time.time', side_effect=self._get_timestamp))
+    def get_patched_module(self):
+        """Return list of the patches to do."""
+        return time
         
-        self.patches.append(
-            mock.patch('time.sleep', side_effect=self._advance_time_stamp))
+    def get_patch_actions(self):
+        """Return generator containing all patches to do."""
+        return [
+            ('time', time.time, self._get_timestamp),
+            ('sleep', time.sleep, self._advance_time_stamp)
+        ]
     
     def _get_timestamp(self):
         """Return the clock timestamp.
