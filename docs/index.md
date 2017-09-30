@@ -57,9 +57,12 @@ Can Patch and determine future events for event based modules using select:
 ```python
 with TimeTravel() as t:
     fd = mock.MagicMock()
-    t.events_pool.add_future_event(86402, fd, t.events_types.select.WRITE)
+    t.add_future_event(2, fd, t.event_types.select.WRITE)
+    
+    now = t.clock.time
     assert select.select([], [fd], []) == ([], [fd], [])
-    assert time.time() == 86402
+    assert time.time() == now + 2
+    assert datetime_cls.today() == datetime_cls.fromtimestamp(now + 2)
 ```
 
 Or using ``poll`` (linux only):
@@ -67,13 +70,14 @@ Or using ``poll`` (linux only):
 ```python
 with TimeTravel() as t:
     fd = mock.MagicMock()
-    t.events_pool.add_future_event(86402, fd, select.POLLIN)
-
+    t.add_future_event(2, fd, select.POLLIN)
+    
     poll = select.poll()
     poll.register(fd, select.POLLIN | select.POLLOUT)
-
+    
+    now = t.clock.time
     assert poll.poll() == [(fd, select.POLLIN)]
-    assert time.time() == 86402
+    assert time.time() == now + 2
 ```
 
 ## List of currently patched modules and functions
