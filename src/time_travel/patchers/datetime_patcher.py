@@ -24,7 +24,7 @@ Modifications to the file was to leave the patching of datetime libray only,
 and remove any other patching or any other advanced logic.
 """
 
-from .basic_patcher import BasicPatcher
+from .basic_patcher import BasePatcher
 
 import sys
 import datetime
@@ -155,7 +155,7 @@ def pickle_fake_datetime(datetime_):
     )
 
 
-class DatetimePatcher(BasicPatcher):
+class DatetimePatcher(BasePatcher):
     """Patcher of the datetime module.
     
     patching:
