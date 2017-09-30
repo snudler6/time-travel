@@ -6,7 +6,7 @@ import pytest
 
 from time_travel import TimeTravel
 
-from .wait_and_response import wait_and_response
+from .wait_and_response import wait_and_respond
 
 
 def test_basic_behaviour():
