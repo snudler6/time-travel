@@ -1,6 +1,5 @@
-import sys
 from setuptools import setup
-
+import select
 
 version = '1.1.0'
 
@@ -11,7 +10,8 @@ PATCHERS = [
         'time_patcher = src.time_travel.patchers.time_patcher:TimePatcher',
     ]
 
-if sys.platform != 'win32':
+
+if hasattr(select, 'poll'):
     PATCHERS.append('poll_patcher = src.time_travel.patchers.poll_patcher:PollPatcher')
 
 
