@@ -5,7 +5,7 @@ import inspect
 
 
 class BasePatcher(object):
-    """Base class for patching time modules."""
+    """Base class for patching time and I/O modules."""
     
     def __init__(self,
                  clock,

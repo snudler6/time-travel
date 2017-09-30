@@ -93,7 +93,7 @@ class PollPatcher(BasePatcher):
         super(PollPatcher, self).__init__(*args, **kwargs)
 
     def get_patched_module(self):
-        """Do more stuff."""
+        """Return the actual module obect to be patched."""
         return select_lib
         
     def get_patch_actions(self):
