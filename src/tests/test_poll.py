@@ -22,7 +22,8 @@ class TestPollPatcher(object):
         """Start a poll patcher"""
         self.events_pool = EventsPool()
         self.clock = TimeMachineClock(clock_listeners=[self.events_pool])
-        self.patcher = PollPatcher(self.clock, self.events_pool)
+        self.patcher = PollPatcher(self.clock, self.events_pool,
+                                   modules_to_patch=__name__)
         self.patcher.start()
 
         self.poll = select.poll()

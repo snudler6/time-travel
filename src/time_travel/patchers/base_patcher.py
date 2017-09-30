@@ -63,7 +63,7 @@ class BasePatcher(object):
     
     def start(self):
         """Start the patcher."""
-        patch_actions = list(self.get_patch_actions())
+        patch_actions = self.get_patch_actions()
         
         local_names = [local_name for _, local_name, _, _ in patch_actions]
         real_id_to_fake = {id(real): fake for _, _, real, fake in

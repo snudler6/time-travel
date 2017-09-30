@@ -99,7 +99,7 @@ class PollPatcher(BasePatcher):
         
     def get_patch_actions(self):
         """Return generator containing all patches to do."""
-        return ['poll', '', select_lib.poll, self._mock_poll]
+        return [('poll', '', select_lib.poll, self._mock_poll)]
     
     def _mock_poll(self):
         return MockPollObject(self.clock, self.events_pool)

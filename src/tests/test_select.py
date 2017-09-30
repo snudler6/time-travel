@@ -16,7 +16,8 @@ class TestSelectPatcher(object):
 
         self.clock = TimeMachineClock(clock_listeners=[self.events_pool])
         
-        self.patcher = SelectPatcher(self.clock, self.events_pool)
+        self.patcher = SelectPatcher(self.clock, self.events_pool,
+                                     modules_to_patch=__name__)
         
         self.patcher.start()
     
