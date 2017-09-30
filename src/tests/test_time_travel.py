@@ -1,5 +1,5 @@
 from time_travel import TimeTravel
-from time_travel.patchers.tests.utils import _t
+from .utils import _t
 
 import time
 import select
