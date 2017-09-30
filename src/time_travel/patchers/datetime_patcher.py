@@ -180,8 +180,8 @@ class DatetimePatcher(BasePatcher):
     def get_patch_actions(self):
         """Do stuff."""
         return [
-            ('date', '_real_date', _real_date, FakeDate),
-            ('datetime', '_real_datetime', _real_datetime, FakeDatetime)
+            ('date', _real_date, FakeDate),
+            ('datetime', _real_datetime, FakeDatetime)
         ]
         
     def start_extra_actions(self):

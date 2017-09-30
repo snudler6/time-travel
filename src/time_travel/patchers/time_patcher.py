@@ -25,9 +25,8 @@ class TimePatcher(BasePatcher):
     def get_patch_actions(self):
         """Return generator containing all patches to do."""
         return [
-            ('time', '', time.time,
-             mock.Mock(side_effect=self._get_timestamp)),
-            ('sleep', '', time.sleep,
+            ('time', time.time, mock.Mock(side_effect=self._get_timestamp)),
+            ('sleep', time.sleep,
              mock.Mock(side_effect=self._advance_time_stamp))
         ]
     

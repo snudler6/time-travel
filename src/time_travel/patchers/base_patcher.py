@@ -2,7 +2,6 @@
 
 import sys
 import mock
-import importlib
 
 
 class BasePatcher(object):
@@ -24,8 +23,7 @@ class BasePatcher(object):
         else:
             self.modules_to_patch = [modules_to_patch]
             
-        self.patcher_module = importlib.import_module(patcher_module) if\
-            patcher_module else None
+        self.patcher_module = patcher_module if patcher_module else None
         self._undo_set = set()
         
     @classmethod
@@ -47,7 +45,6 @@ class BasePatcher(object):
         
         The list structure is tuples containgin:
             (real_attribute_name,
-             local_attribute_name,
              the_real_attribue,
              fake_attribute)
         """
@@ -65,12 +62,11 @@ class BasePatcher(object):
         """Start the patcher."""
         patch_actions = self.get_patch_actions()
         
-        local_names = [local_name for _, local_name, _, _ in patch_actions]
-        real_id_to_fake = {id(real): fake for _, _, real, fake in
+        real_id_to_fake = {id(real): fake for _, real, fake in
                            patch_actions}
         
         patched_module = self.get_patched_module()
-        for real_name, _, real_attr, fake_attr in patch_actions:
+        for real_name, real_attr, fake_attr in patch_actions:
             self._save_for_undo(patched_module, real_name, real_attr)
             setattr(patched_module, real_name, fake_attr)
             
@@ -105,8 +101,7 @@ class BasePatcher(object):
                 
                 # If the attribute is on this module - avoid recursion.
                 # Do stuff only if the attribute is datetime or date classes.
-                if attr in local_names or \
-                        id(attribute_value) not in real_id_to_fake.keys():
+                if id(attribute_value) not in real_id_to_fake.keys():
                     continue
                     
                 # Find the relative mock object for the original class.

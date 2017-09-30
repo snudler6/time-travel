@@ -24,7 +24,7 @@ class SelectPatcher(BasePatcher):
         
     def get_patch_actions(self):
         """Return generator containing all patches to do."""
-        return [('select', '', select.select, self.select)]
+        return [('select', select.select, self.select)]
         
     def get_patched_module(self):
         """Do stuff."""
