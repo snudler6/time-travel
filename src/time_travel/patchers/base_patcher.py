@@ -1,4 +1,4 @@
-"""Base class for patching time modules."""
+"""Base class for patching time and I/O modules."""
 
 import sys
 import inspect
