@@ -81,7 +81,7 @@ def test_select_no_timeout():
     with TimeTravel(modules_to_patch=__name__) as t:
         fd = mock.MagicMock()
         
-        t.add_future_event(2, fd, t.events_types.select.WRITE)
+        t.add_future_event(2, fd, t.event_types.select.WRITE)
 
         now = t.clock.time
         assert select.select([], [fd], []) == ([], [fd], [])
@@ -93,7 +93,7 @@ def test_select_with_timeout():
     with TimeTravel(modules_to_patch=__name__) as t:
         fd = mock.MagicMock()
         
-        t.add_future_event(2, fd, t.events_types.select.EXCEPTIONAL)
+        t.add_future_event(2, fd, t.event_types.select.EXCEPTIONAL)
 
         now = t.clock.time
         assert select.select([], [], [fd], 6) == ([], [], [fd])
@@ -105,7 +105,7 @@ def test_select_timeout_occurring():
     with TimeTravel(modules_to_patch=__name__) as t:
         fd = mock.MagicMock()
         
-        t.add_future_event(10, fd, t.events_types.select.READ)
+        t.add_future_event(10, fd, t.event_types.select.READ)
 
         now = t.clock.time
         assert select.select([fd], [], [], 6) == ([], [], [])

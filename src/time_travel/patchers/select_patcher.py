@@ -29,7 +29,7 @@ class SelectPatcher(BasicPatcher):
         return cls.EVENTS_NAMESPACE
     
     @classmethod
-    def get_events_types(cls):
+    def get_event_types(cls):
         """Return Enum of select events types."""
         return cls.EventTypes 
         

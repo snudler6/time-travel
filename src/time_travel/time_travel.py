@@ -16,7 +16,7 @@ class TimeTravel(object):
       event_pool object corresponding to the event_pool interface.
     """
     
-    class EventsType(object):
+    class EventTypes(object):
         """Empty class to register events types on."""
     
     def __init__(self, start_time=MIN_START_TIME, **kwargs):
@@ -36,26 +36,32 @@ class TimeTravel(object):
                                 **kwargs)
                         for patcher in patches]
         
-        self.events_types = TimeTravel.EventsType()
+        self.event_types = self.EventTypes()
         
         for patcher in self.patches:
             if patcher.get_events_namespace() is not None:
-                setattr(self.events_types,
+                setattr(self.event_types,
                         patcher.get_events_namespace(),
-                        patcher.get_events_types())
+                        patcher.get_event_types())
 
     def add_future_event(self, time_from_now, fd, event):
         """Add an event to the event pool with a relative timestamp."""
-        self.event_pool.add_future_event(self.clock.time + time_from_now,
-                                         fd,
-                                         event)
-   
-    def __enter__(self):
+        abs_time = self.clock.time + time_from_now
+        self.event_pool.add_future_event(abs_time, fd, event)
+
+    def start(self):
+        """Start all the patchers."""
         for patcher in self.patches:
             patcher.start()
-        
+
+    def stop(self):
+        """Stop all the patchers."""
+        for patcher in self.patches:
+            patcher.stop()
+
+    def __enter__(self):
+        self.start()
         return self
         
     def __exit__(self, *args):
-        for patcher in self.patches:
-            patcher.stop()
+        self.stop()

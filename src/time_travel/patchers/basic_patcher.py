@@ -28,7 +28,7 @@ class BasicPatcher(object):
         return None
     
     @classmethod
-    def get_events_types(cls):
+    def get_event_types(cls):
         """Return Enum of the patcher's events types."""
         return None
                 
