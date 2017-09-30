@@ -2,40 +2,41 @@
 
 
 class EventPool(object):
-    """Events set for handling patches of event derived libraries.
+    """A pool that holds I/O events and their expiration time.
 
-    The pool contains a dictionary that for each second since epoc holds
-    file descriptors and the events that will occur for them.
-    The dictionary's format is as follows:
+    The pool holds file descriptors and the events that will occur for them
+    for each second since epoch.
+    For example, a file descriptor can contain a READABLE and/or a WRITABLE
+    event. The event types themselves are defined by the I/O mock class.
+
+    The descriptors are held in a dictionary with the following format:
       self._future_events = {timestamp: {fd: set(event, ...), ...}}
     """
 
     def __init__(self):
-        """Initialise an event pool."""
+        """Initialize the event pool."""
         self._future_events = {}
         
     def add_future_event(self, timestamp, fd, event):
         """Add an event to a given timestamp.
         
-        - timestamp: time in seconds since the epoch.
-        - fd: any object (preferebly mock object) identifying the object that
-              a patched event waiting function will be waiting on.
-        - event: any object the relevant patcher will filter by.
+        - timestamp: Time in seconds since the epoch.
+        - fd: Any object that an I/O function (select, poll, etc.) will be
+              waiting on.
+        - event: Any object that the relevant patcher can filter the event by.
         """
         ts_dict = self._future_events.setdefault(timestamp, dict())
         fd_set = ts_dict.setdefault(fd, set())
         fd_set.add(event)
         
     def get_events(self, predicate=None):
-        """Return all added events sorted by timestamp.
+        """Return a list of all added events sorted by timestamp.
         
-        - predicate: A condition to filter the events by. The condition will
-                     be activated on the `event` passed to `add_future_event`.
+        - predicate: A condition to filter the fds ane events by.
+                     The predicate will be checked on the (fd, event) tuple.
                      
-        The returned list is:
-        [(timestamp1, [(fd, set(events)), ...]),
-         (timestamp2, [(fd, set(events)), ...]), ...]
-        where the timestamps are sorted.
+        The returned list is in the following format (and sorted by timestamp):
+          [(timestamp, [(fd, set(events)), ...]), ...]
         """
         predicate = (lambda fd, evt: True) if predicate is None else predicate
         
@@ -44,13 +45,13 @@ class EventPool(object):
             out = []
 
             for fd, event_set in _ts_dict.items():
-                fd_set = set()
+                out_events = set()
                 for event in event_set:
                     if predicate(fd, event):
-                        fd_set.add(event)
+                        out_events.add(event)
 
-                if fd_set:
-                    out.append((fd, fd_set))
+                if out_events:
+                    out.append((fd, out_events))
 
             return out
 
@@ -63,18 +64,21 @@ class EventPool(object):
         return sorted(filtered_events, key=lambda x: x[0])
 
     def get_next_event(self, predicate=None):
-        """Return the next event to occur."""
+        """Return the next event to occur.
+
+        The returned evens it a tuple of (timestamp, [(fd, set(events)), ...]).
+        """
         events = self.get_events(predicate)
         return (None, []) if not events else events[0]
 
     def set_time(self, timestamp):
         """Remove all events before the given timestamp.
         
-        - timestamp: time in seconds since the epoch.
+        - timestamp: Time in seconds since the epoch.
          
-        A callback function for time_machine_clock changes.
-        After a time has change, the pool can get rid of events, already
-        happened but no called in any patch.
+        This method ia a callback function for `time_machine_clock` changes.
+        After the time has changed, the pool can throw away older events that
+        had already satisfied.
         """
         self._future_events = {k: v for k, v in self._future_events.items()
                                if k >= timestamp}

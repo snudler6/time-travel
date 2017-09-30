@@ -56,9 +56,9 @@ Can Patch and determine future events for event based modules using select:
 
 ```python
 with TimeTravel() as t:
-    event = mock.MagicMock()
-    t.events_pool.add_future_event(86402, event, t.events_types.select.WRITE)
-    assert select.select([], [event], []) == ([], [event], [])
+    fd = mock.MagicMock()
+    t.events_pool.add_future_event(86402, fd, t.events_types.select.WRITE)
+    assert select.select([], [fd], []) == ([], [fd], [])
     assert time.time() == 86402
 ```
 

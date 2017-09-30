@@ -10,9 +10,9 @@ class TimeTravel(object):
     """Context-manager patching time libraries.
     
     - For setting timestamps and advancing the time, use the clock object
-      corresponiding to the time_machine_clock interface
+      corresponding to the time_machine_clock interface
       
-    - For setting events for event based libraies (i.e. select) use the
+    - For setting events for event based libraries (e.g. select) use the
       event_pool object corresponding to the event_pool interface.
     """
     
@@ -43,6 +43,12 @@ class TimeTravel(object):
                 setattr(self.events_types,
                         patcher.get_events_namespace(),
                         patcher.get_events_types())
+
+    def add_future_event(self, time_from_now, fd, event):
+        """Add an event to the event pool with a relative timestamp."""
+        self.event_pool.add_future_event(self.clock.time + time_from_now,
+                                         fd,
+                                         event)
    
     def __enter__(self):
         for patcher in self.patches:
