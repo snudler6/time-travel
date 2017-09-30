@@ -14,8 +14,8 @@ def sec2msec(sec):
     return int(sec * 1000)
 
 
-@pytest.mark.skipif(sys.platform == 'win32',
-                    reason='select.poll is not supported under win32')
+@pytest.mark.skipif(not hasattr(select, 'poll'),
+                    reason='select.poll is not supported in this platform')
 class TestPollPatcher(object):
 
     def setup_method(self, method):

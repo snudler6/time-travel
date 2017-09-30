@@ -65,7 +65,7 @@ with TimeTravel() as t:
     assert datetime_cls.today() == datetime_cls.fromtimestamp(now + 2)
 ```
 
-Or using ``poll`` (linux only):
+Or using ``poll`` (for supported platforms only):
 
 ```python
 with TimeTravel() as t:
@@ -89,7 +89,7 @@ with TimeTravel() as t:
 - datetime.datetime.now
 - datetime.datetime.utcnow
 - select.select
-- select.poll (linux only)
+- select.poll (for supported platforms only)
 
 ### Add your own patches to time-travel
 
