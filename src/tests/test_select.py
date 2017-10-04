@@ -4,6 +4,7 @@ from time_travel.event_pool import EventPool
 from .utils import _t
 
 import select
+import socket
 import pytest
 
 
@@ -25,12 +26,12 @@ class TestSelectPatcher(object):
         self.patcher.stop()
         
     def test_basic_usage(self):
-        fd = "socket"
+        sock = socket.socket()
         self.event_pool.add_future_event(_t(2),
-                                         fd,
+                                         sock,
                                          SelectPatcher.EventTypes.READ)
         
-        assert select.select([fd], [], [], 17) == ([fd], [], [])
+        assert select.select([sock], [], [], 17) == ([sock], [], [])
         assert self.clock.time == _t(2)
 
     def test_empty_lists(self):
@@ -38,131 +39,132 @@ class TestSelectPatcher(object):
         assert self.clock.time == _t(17)
     
     def test_future_event_after_timeout(self):
-        fd = "socket"
+        sock = socket.socket()
         self.event_pool.add_future_event(_t(27),
-                                         fd,
+                                         sock,
                                          SelectPatcher.EventTypes.READ)
         
-        assert select.select([], [fd], [], 17) == ([], [], [])
+        assert select.select([], [sock], [], 17) == ([], [], [])
         assert self.clock.time == _t(17)
         
-    def test_adding_unwaited_fds(self):
-        first_fd = 1
-        second_fd = 2
-        waited_for_fd = 3
+    def test_adding_unwaited_sockets(self):
+        first_sock = socket.socket()
+        second_sock = socket.socket()
+        waited_for_sock = socket.socket()
         
         self.event_pool.add_future_event(_t(3),
-                                         first_fd,
+                                         first_sock,
                                          SelectPatcher.EventTypes.READ)
         self.event_pool.add_future_event(_t(4),
-                                         second_fd,
+                                         second_sock,
                                          SelectPatcher.EventTypes.WRITE)
         self.event_pool.add_future_event(_t(5),
-                                         waited_for_fd,
+                                         waited_for_sock,
                                          SelectPatcher.EventTypes.READ)
         
-        assert select.select([waited_for_fd], [], [], 7) == \
-            ([waited_for_fd], [], [])
+        assert select.select([waited_for_sock], [], [], 7) == \
+            ([waited_for_sock], [], [])
         
         assert self.clock.time == _t(5)
         
-    def test_multiple_fds_for_same_time(self):
-        fd1 = 1
-        fd2 = 2
-        fd3 = 3
-        fd4 = 4
-        unwaited_fd = 5
+    def test_multiple_sockets_for_same_time(self):
+        sock1 = socket.socket()
+        sock2 = socket.socket()
+        sock3 = socket.socket()
+        sock4 = socket.socket()
+        unwaited_sock = socket.socket()
         
         self.event_pool.add_future_event(_t(3),
-                                         fd1,
+                                         sock1,
                                          SelectPatcher.EventTypes.READ)
         self.event_pool.add_future_event(_t(3),
-                                         fd2,
+                                         sock2,
                                          SelectPatcher.EventTypes.READ)
         self.event_pool.add_future_event(_t(3),
-                                         fd3,
+                                         sock3,
                                          SelectPatcher.EventTypes.WRITE)
         self.event_pool.add_future_event(_t(3),
-                                         fd4,
+                                         sock4,
                                          SelectPatcher.EventTypes.EXCEPTIONAL)
         self.event_pool.add_future_event(_t(3),
-                                         unwaited_fd,
+                                         unwaited_sock,
                                          SelectPatcher.EventTypes.READ)
         
         returned_events = select.select(
-            [fd1, fd2],
-            [fd3],
-            [fd4],
+            [sock1, sock2],
+            [sock3],
+            [sock4],
             7
         )
         
-        expected_events = ([fd1, fd2], [fd3], [fd4])
+        expected_events = ([sock1, sock2], [sock3], [sock4])
         
         for returned, expected in zip(returned_events, expected_events):
             assert set(returned) == set(expected)
         
         assert self.clock.time == _t(3)
 
-    def test_fd_not_returned_twice(self):
-        fd = 1
+    def test_socket_not_returned_twice(self):
+        sock = socket.socket()
         
         self.event_pool.add_future_event(_t(3),
-                                         fd,
+                                         sock,
                                          SelectPatcher.EventTypes.EXCEPTIONAL)
         
-        assert select.select([], [], [fd], 6) == ([], [], [fd])
+        assert select.select([], [], [sock], 6) == ([], [], [sock])
         assert self.clock.time == _t(3)
         
-        assert select.select([], [], [fd], 6) == ([], [], [])
+        assert select.select([], [], [sock], 6) == ([], [], [])
         assert self.clock.time == _t(3 + 6)
           
-    def test_same_fd_multiple_timestamps(self):
-        fd = 1
+    def test_same_socket_multiple_timestamps(self):
+        sock = socket.socket()
         
         self.event_pool.add_future_event(_t(1),
-                                         fd,
+                                         sock,
                                          SelectPatcher.EventTypes.EXCEPTIONAL)
         self.event_pool.add_future_event(_t(2),
-                                         fd,
+                                         sock,
                                          SelectPatcher.EventTypes.READ)
         self.event_pool.add_future_event(_t(2),
-                                         fd,
+                                         sock,
                                          SelectPatcher.EventTypes.EXCEPTIONAL)
         
-        assert select.select([], [], [fd], 6) == ([], [], [fd])
+        assert select.select([], [], [sock], 6) == ([], [], [sock])
         assert self.clock.time == _t(1)
         
-        assert select.select([fd], [], [fd], 6) == ([fd], [], [fd])
+        assert select.select([sock], [], [sock], 6) == ([sock], [], [sock])
         assert self.clock.time == _t(2)
 
     def test_select_with_no_timeout(self):
-        fd = 10
+        sock = socket.socket()
         
         self.event_pool.add_future_event(_t(3),
-                                         fd,
+                                         sock,
                                          SelectPatcher.EventTypes.READ)
         
-        assert select.select([fd], [], []) == ([fd], [], [])
+        assert select.select([sock], [], []) == ([sock], [], [])
         assert self.clock.time == _t(3)
 
     def test_select_infinite_wait(self):
-        fd = 9
+        sock = socket.socket()
         
         with pytest.raises(ValueError):
-            select.select([fd], [], [])
+            select.select([sock], [], [])
             
-    def test_fd_returned_in_multiple_lists(self):
-        fd = 8
+    def test_socket_returned_in_multiple_lists(self):
+        sock = socket.socket()
         
         self.event_pool.add_future_event(_t(1),
-                                         fd,
+                                         sock,
                                          SelectPatcher.EventTypes.READ)
         self.event_pool.add_future_event(_t(1),
-                                         fd,
+                                         sock,
                                          SelectPatcher.EventTypes.WRITE)
         self.event_pool.add_future_event(_t(1),
-                                         fd,
+                                         sock,
                                          SelectPatcher.EventTypes.EXCEPTIONAL)
         
-        assert select.select([fd], [fd], [fd], 6) == ([fd], [fd], [fd])
+        assert select.select([sock], [sock], [sock], 6) == \
+            ([sock], [sock], [sock])
         assert self.clock.time == _t(1)
