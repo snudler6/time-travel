@@ -5,8 +5,6 @@ from .utils import _t
 
 import select
 import pytest
-import mock
-import sys
 
 
 def sec2msec(sec):
@@ -42,7 +40,7 @@ class TestPollPatcher(object):
             self.poll.poll()
 
     def test_one_fd(self):
-        fd = mock.MagicMock()
+        fd = 1
         self.event_pool.add_future_event(_t(2), fd, select.POLLIN)
 
         self.poll.register(fd, select.POLLIN)
@@ -51,7 +49,7 @@ class TestPollPatcher(object):
         assert self.clock.time == _t(2)
 
     def test_timeout_before_event(self):
-        fd = mock.MagicMock()
+        fd = 7
         self.event_pool.add_future_event(_t(10), fd, select.POLLIN)
 
         self.poll.register(fd, select.POLLIN)
@@ -60,9 +58,9 @@ class TestPollPatcher(object):
         assert self.clock.time == _t(5)
         
     def test_unregistered_events(self):
-        first_fd = mock.MagicMock(name='first_fd')
-        second_fd = mock.MagicMock(name='second_fd')
-        expected_fd = mock.MagicMock(name='expected_fd')
+        first_fd = 1
+        second_fd = 2
+        expected_fd = 3
         
         self.event_pool.add_future_event(_t(3), first_fd, select.POLLIN)
         self.event_pool.add_future_event(_t(4), second_fd, select.POLLIN)
@@ -74,11 +72,11 @@ class TestPollPatcher(object):
         assert self.clock.time == _t(5)
         
     def test_multiple_fds_same_time(self):
-        fd1 = mock.MagicMock(name='fd1')
-        fd2 = mock.MagicMock(name='fd2')
-        fd3 = mock.MagicMock(name='fd3')
-        far_fd = mock.MagicMock(name='far_fd')
-        unwaited_fd = mock.MagicMock(name='unwaited_fd')
+        fd1 = 1
+        fd2 = 2
+        fd3 = 3
+        far_fd = 4
+        unwaited_fd = 5
         
         self.event_pool.add_future_event(_t(3), fd1, select.POLLIN)
         self.event_pool.add_future_event(_t(3), fd2, select.POLLIN)
@@ -97,7 +95,7 @@ class TestPollPatcher(object):
         assert self.clock.time == _t(3)
 
     def test_same_fd_multiple_events(self):
-        fd = mock.MagicMock()
+        fd = 5
 
         self.event_pool.add_future_event(_t(3), fd, select.POLLIN)
         self.event_pool.add_future_event(_t(3), fd, select.POLLOUT)
@@ -109,7 +107,7 @@ class TestPollPatcher(object):
         assert self.clock.time == _t(3)
 
     def test_event_not_in_mask(self):
-        fd = mock.MagicMock()
+        fd = 8
 
         self.event_pool.add_future_event(_t(3), fd, select.POLLIN)
 
@@ -119,7 +117,7 @@ class TestPollPatcher(object):
         assert self.clock.time == _t(25)
 
     def test_event_not_returned_twice(self):
-        fd = mock.MagicMock()
+        fd = 2
         
         self.event_pool.add_future_event(_t(3), fd, select.POLLIN)
         self.poll.register(fd, select.POLLIN)
@@ -131,7 +129,7 @@ class TestPollPatcher(object):
         assert self.clock.time == _t(3 + 5)
           
     def test_same_event_multiple_timestamps(self):
-        fd = mock.MagicMock()
+        fd = 1
         
         self.event_pool.add_future_event(_t(1), fd, select.POLLIN)
         self.event_pool.add_future_event(_t(2), fd, select.POLLIN)
@@ -146,7 +144,7 @@ class TestPollPatcher(object):
         assert self.clock.time == _t(2)
 
     def test_unregister(self):
-        fd = mock.MagicMock()
+        fd = 9
 
         self.event_pool.add_future_event(_t(1), fd, select.POLLIN)
         self.event_pool.add_future_event(_t(5), fd, select.POLLIN)
@@ -162,7 +160,7 @@ class TestPollPatcher(object):
         assert self.clock.time == _t(1 + 10)
 
     def test_modify(self):
-        fd = mock.MagicMock()
+        fd = 5
 
         self.event_pool.add_future_event(_t(1), fd, select.POLLIN)
         self.event_pool.add_future_event(_t(5), fd, select.POLLIN)

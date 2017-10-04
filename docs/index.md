@@ -56,7 +56,7 @@ Can Patch and determine future events for event based modules using select:
 
 ```python
 with TimeTravel() as t:
-    fd = mock.MagicMock()
+    fd = socket.socket()
     t.add_future_event(2, fd, t.event_types.select.WRITE)
     
     now = t.clock.time
@@ -69,7 +69,7 @@ Or using ``poll`` (for supported platforms only):
 
 ```python
 with TimeTravel() as t:
-    fd = mock.MagicMock()
+    fd = socket.socket()
     t.add_future_event(2, fd, select.POLLIN)
     
     poll = select.poll()

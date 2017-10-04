@@ -3,9 +3,8 @@ from .utils import _t
 
 import time
 import select
-import mock
 import pytest
-import sys
+import socket
 from datetime import datetime
 from datetime import datetime as datetime_cls
 
@@ -79,7 +78,7 @@ def test_sleep_changing_datetime_now():
 
 def test_select_no_timeout():
     with TimeTravel(modules_to_patch=__name__) as t:
-        fd = mock.MagicMock()
+        fd = socket.socket()
         
         t.add_future_event(2, fd, t.event_types.select.WRITE)
 
@@ -91,7 +90,7 @@ def test_select_no_timeout():
         
 def test_select_with_timeout():
     with TimeTravel(modules_to_patch=__name__) as t:
-        fd = mock.MagicMock()
+        fd = socket.socket()
         
         t.add_future_event(2, fd, t.event_types.select.EXCEPTIONAL)
 
@@ -103,7 +102,7 @@ def test_select_with_timeout():
         
 def test_select_timeout_occurring():
     with TimeTravel(modules_to_patch=__name__) as t:
-        fd = mock.MagicMock()
+        fd = socket.socket()
         
         t.add_future_event(10, fd, t.event_types.select.READ)
 
@@ -117,7 +116,7 @@ def test_select_timeout_occurring():
                     reason='select.poll is not supported in this platform')
 def test_poll():
     with TimeTravel(modules_to_patch=__name__) as t:
-        fd = mock.MagicMock()
+        fd = socket.socket()
         t.add_future_event(2, fd, select.POLLIN)
 
         poll = select.poll()

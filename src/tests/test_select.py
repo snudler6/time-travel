@@ -4,7 +4,6 @@ from time_travel.event_pool import EventPool
 from .utils import _t
 
 import select
-import mock
 import pytest
 
 
@@ -26,7 +25,7 @@ class TestSelectPatcher(object):
         self.patcher.stop()
         
     def test_basic_usage(self):
-        fd = mock.MagicMock()
+        fd = "socket"
         self.event_pool.add_future_event(_t(2),
                                          fd,
                                          SelectPatcher.EventTypes.READ)
@@ -39,7 +38,7 @@ class TestSelectPatcher(object):
         assert self.clock.time == _t(17)
     
     def test_future_event_after_timeout(self):
-        fd = mock.MagicMock()
+        fd = "socket"
         self.event_pool.add_future_event(_t(27),
                                          fd,
                                          SelectPatcher.EventTypes.READ)
@@ -48,9 +47,9 @@ class TestSelectPatcher(object):
         assert self.clock.time == _t(17)
         
     def test_adding_unwaited_fds(self):
-        first_fd = mock.MagicMock(name='first_fd')
-        second_fd = mock.MagicMock(name='second_fd')
-        waited_for_fd = mock.MagicMock(name='waited_for_fd')
+        first_fd = 1
+        second_fd = 2
+        waited_for_fd = 3
         
         self.event_pool.add_future_event(_t(3),
                                          first_fd,
@@ -68,11 +67,11 @@ class TestSelectPatcher(object):
         assert self.clock.time == _t(5)
         
     def test_multiple_fds_for_same_time(self):
-        fd1 = mock.MagicMock(name='fd1')
-        fd2 = mock.MagicMock(name='fd2')
-        fd3 = mock.MagicMock(name='fd3')
-        fd4 = mock.MagicMock(name='fd4')
-        unwaited_fd = mock.MagicMock(name='unwaited_fd')
+        fd1 = 1
+        fd2 = 2
+        fd3 = 3
+        fd4 = 4
+        unwaited_fd = 5
         
         self.event_pool.add_future_event(_t(3),
                                          fd1,
@@ -105,7 +104,7 @@ class TestSelectPatcher(object):
         assert self.clock.time == _t(3)
 
     def test_fd_not_returned_twice(self):
-        fd = mock.MagicMock()
+        fd = 1
         
         self.event_pool.add_future_event(_t(3),
                                          fd,
@@ -118,7 +117,7 @@ class TestSelectPatcher(object):
         assert self.clock.time == _t(3 + 6)
           
     def test_same_fd_multiple_timestamps(self):
-        fd = mock.MagicMock()
+        fd = 1
         
         self.event_pool.add_future_event(_t(1),
                                          fd,
@@ -137,7 +136,7 @@ class TestSelectPatcher(object):
         assert self.clock.time == _t(2)
 
     def test_select_with_no_timeout(self):
-        fd = mock.MagicMock()
+        fd = 10
         
         self.event_pool.add_future_event(_t(3),
                                          fd,
@@ -147,13 +146,13 @@ class TestSelectPatcher(object):
         assert self.clock.time == _t(3)
 
     def test_select_infinite_wait(self):
-        fd = mock.MagicMock()
+        fd = 9
         
         with pytest.raises(ValueError):
             select.select([fd], [], [])
             
     def test_fd_returned_in_multiple_lists(self):
-        fd = mock.MagicMock()
+        fd = 8
         
         self.event_pool.add_future_event(_t(1),
                                          fd,
