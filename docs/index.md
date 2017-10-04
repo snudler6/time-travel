@@ -56,11 +56,11 @@ Can Patch and determine future events for event based modules using select:
 
 ```python
 with TimeTravel() as t:
-    fd = socket.socket()
-    t.add_future_event(2, fd, t.event_types.select.WRITE)
+    sock = socket.socket()
+    t.add_future_event(2, sock, t.event_types.select.WRITE)
     
     now = t.clock.time
-    assert select.select([], [fd], []) == ([], [fd], [])
+    assert select.select([], [sock], []) == ([], [sock], [])
     assert time.time() == now + 2
     assert datetime_cls.today() == datetime_cls.fromtimestamp(now + 2)
 ```
@@ -69,14 +69,14 @@ Or using ``poll`` (for supported platforms only):
 
 ```python
 with TimeTravel() as t:
-    fd = socket.socket()
-    t.add_future_event(2, fd, select.POLLIN)
+    sock = socket.socket()
+    t.add_future_event(2, sock, select.POLLIN)
     
     poll = select.poll()
-    poll.register(fd, select.POLLIN | select.POLLOUT)
+    poll.register(sock, select.POLLIN | select.POLLOUT)
     
     now = t.clock.time
-    assert poll.poll() == [(fd, select.POLLIN)]
+    assert poll.poll() == [(sock, select.POLLIN)]
     assert time.time() == now + 2
 ```
 
