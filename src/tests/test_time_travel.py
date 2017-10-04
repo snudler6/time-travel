@@ -78,36 +78,36 @@ def test_sleep_changing_datetime_now():
 
 def test_select_no_timeout():
     with TimeTravel(modules_to_patch=__name__) as t:
-        fd = socket.socket()
+        sock = socket.socket()
         
-        t.add_future_event(2, fd, t.event_types.select.WRITE)
+        t.add_future_event(2, sock, t.event_types.select.WRITE)
 
         now = t.clock.time
-        assert select.select([], [fd], []) == ([], [fd], [])
+        assert select.select([], [sock], []) == ([], [sock], [])
         assert time.time() == now + 2
         assert datetime_cls.today() == datetime_cls.fromtimestamp(now + 2)
       
         
 def test_select_with_timeout():
     with TimeTravel(modules_to_patch=__name__) as t:
-        fd = socket.socket()
+        sock = socket.socket()
         
-        t.add_future_event(2, fd, t.event_types.select.EXCEPTIONAL)
+        t.add_future_event(2, sock, t.event_types.select.EXCEPTIONAL)
 
         now = t.clock.time
-        assert select.select([], [], [fd], 6) == ([], [], [fd])
+        assert select.select([], [], [sock], 6) == ([], [], [sock])
         assert time.time() == now + 2
         assert datetime_cls.today() == datetime_cls.fromtimestamp(now + 2)
      
         
 def test_select_timeout_occurring():
     with TimeTravel(modules_to_patch=__name__) as t:
-        fd = socket.socket()
+        sock = socket.socket()
         
-        t.add_future_event(10, fd, t.event_types.select.READ)
+        t.add_future_event(10, sock, t.event_types.select.READ)
 
         now = t.clock.time
-        assert select.select([fd], [], [], 6) == ([], [], [])
+        assert select.select([sock], [], [], 6) == ([], [], [])
         assert time.time() == now + 6
         assert datetime_cls.today() == datetime_cls.fromtimestamp(now + 6)
 
@@ -116,12 +116,12 @@ def test_select_timeout_occurring():
                     reason='select.poll is not supported in this platform')
 def test_poll():
     with TimeTravel(modules_to_patch=__name__) as t:
-        fd = socket.socket()
-        t.add_future_event(2, fd, select.POLLIN)
+        sock = socket.socket()
+        t.add_future_event(2, sock, select.POLLIN)
 
         poll = select.poll()
-        poll.register(fd, select.POLLIN | select.POLLOUT)
+        poll.register(sock, select.POLLIN | select.POLLOUT)
 
         now = t.clock.time
-        assert poll.poll() == [(fd, select.POLLIN)]
+        assert poll.poll() == [(sock, select.POLLIN)]
         assert time.time() == now + 2
