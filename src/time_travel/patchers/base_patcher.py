@@ -7,6 +7,8 @@ import inspect
 class BasePatcher(object):
     """Base class for patching time and I/O modules."""
 
+    # These modules will not be patched by default, unless explicitly specified
+    # in `modules_to_patch`.
     UNPATCHED_MODULES = ['pytest', '_pytest', 'unittest', 'mock', 'threading']
 
     def __init__(self,
