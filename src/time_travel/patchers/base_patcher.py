@@ -9,6 +9,8 @@ class BasePatcher(object):
 
     # These modules will not be patched by default, unless explicitly specified
     # in `modules_to_patch`.
+    # This is done to prevent time-travel from interfering with the timing of
+    # the actual test environment.
     UNPATCHED_MODULES = ['pytest', '_pytest', 'unittest', 'mock', 'threading']
 
     def __init__(self,
