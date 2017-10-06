@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/snudler6/time-travel.svg?branch=master)](https://travis-ci.org/snudler6/time-travel) [![Build status](https://ci.appveyor.com/api/projects/status/y13ewnvmj0muoapf/branch/master?svg=true)](https://ci.appveyor.com/project/snudler6/time-travel/branch/master)
+[![Build Status](https://travis-ci.org/snudler6/time-travel.svg?branch=master)](https://travis-ci.org/snudler6/time-travel) [![Build status](https://ci.appveyor.com/api/projects/status/y13ewnvmj0muoapf/branch/master?svg=true)](https://ci.appveyor.com/project/snudler6/time-travel/branch/master) [![Documentation Status](https://readthedocs.org/projects/time-travel/badge/?version=latest)](http://time-travel.readthedocs.io/en/latest/?badge=latest)
+
 
 # time-travel
 python time libraries mocking
