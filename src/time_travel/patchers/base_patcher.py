@@ -6,7 +6,13 @@ import inspect
 
 class BasePatcher(object):
     """Base class for patching time and I/O modules."""
-    
+
+    # These modules will not be patched by default, unless explicitly specified
+    # in `modules_to_patch`.
+    # This is done to prevent time-travel from interfering with the timing of
+    # the actual test environment.
+    UNPATCHED_MODULES = ['pytest', '_pytest', 'unittest', 'mock', 'threading']
+
     def __init__(self,
                  clock,
                  event_pool,
@@ -100,11 +106,11 @@ class BasePatcher(object):
                 module for mod_name, module in sys.modules.items() if
                 inspect.ismodule(module) and
                 hasattr(module, '__name__') and
-                # Don't patch inside this module,
-                # or inside the original module.
+                # Don't patch inside the original module, this (the patcher)
+                # module, or the unpatched modules.
                 module.__name__ not in ([patched_module,
                                          self.patcher_module,
-                                         __name__]) 
+                                         __name__] + self.UNPATCHED_MODULES)
             ]
         
         # Search in all modules for the object to patch.
