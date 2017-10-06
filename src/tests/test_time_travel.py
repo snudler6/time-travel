@@ -5,7 +5,6 @@ import time
 import select
 import mock
 import pytest
-import sys
 from datetime import datetime
 from datetime import datetime as datetime_cls
 
