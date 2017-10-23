@@ -20,7 +20,7 @@ setup(
     name='time_travel',
     version=version,
     description='Python time mocking',
-    long_description=open('README.md').read(),
+    long_description=open('README.rst').read(),
     license='MIT',
     author='Shachar Nudler',
     author_email='snudler6@gmail.com',
