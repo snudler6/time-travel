@@ -1,11 +1,14 @@
 [![Build Status](https://travis-ci.org/snudler6/time-travel.svg?branch=master)](https://travis-ci.org/snudler6/time-travel) [![Build status](https://ci.appveyor.com/api/projects/status/y13ewnvmj0muoapf/branch/master?svg=true)](https://ci.appveyor.com/project/snudler6/time-travel/branch/master) [![Documentation Status](https://readthedocs.org/projects/time-travel/badge/?version=latest)](http://time-travel.readthedocs.io/en/latest/?badge=latest)
 
 
-# time-travel
-python time libraries mocking
+# time-travel - time and I/O modules mocking library
+**time-travel** is a python library that allows users to write deterministic
+tests for time sensitive and I/O intensive code.
 
-### time-travel is the coolest way to unit-test time sensetive modules.
-### time-travel lets you write determenistic test for long and even infinite time scenarios.
+When loaded, the library mocks modules that access the machine's time
+(e.g. `time`, `datetime`) and I/O event handlers (e.g. `poll`, `select`) and
+replaces them with an internal event-pool implementation that lets the user
+choose when time moves forward and which I/O event will happen next.
 
 **time-travel** supports python 2.7, 3.4, 3.5, 3.6 and pypy on both Linux and Windows.
 
