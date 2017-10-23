@@ -4,9 +4,9 @@ Quick start
 Install
 ^^^^^^^
 
-.. code::
+.. code:: bash
 
-   pip install time_travel
+   $ pip install time_travel
 
 Usage
 ^^^^^

@@ -29,10 +29,10 @@ If you want to patch the current module, you can use the local
 variable `__name__`.
 
 Examples
-========
+--------
 
 Skip timeouts
--------------
+^^^^^^^^^^^^^
 
 Tests are deterministic and take no time with time travel. For example:
 
@@ -61,7 +61,7 @@ Tests are deterministic and take no time with time travel. For example:
        module2.time_sensitive_method()
 
 Patching event based modules
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Can Patch and determine future events for event based modules using select:
 
@@ -92,7 +92,7 @@ Or using ``poll`` (for supported platforms only):
        assert time.time() == now + 2
 
 List of currently patched modules and functions
-===============================================
+-----------------------------------------------
 
 - time.time
 - time.sleep
@@ -104,7 +104,7 @@ List of currently patched modules and functions
 - select.poll (for supported platforms only)
 
 Add your own patches to time-travel
-===================================
+-----------------------------------
 
 time-travel uses `entry points` to add external patchers to it.
 
