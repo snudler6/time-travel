@@ -1,8 +1,4 @@
-# time-travel
-python time libraries mocking
-
-### time-travel is the coolest way to unit-test time sensitive modules.
-### time-travel lets you write deterministic test for long and even infinite time scenarios.
+# time-travel - time and I/O mocking library
 
 ## Usage
 

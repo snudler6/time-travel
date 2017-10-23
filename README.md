@@ -33,7 +33,8 @@ with TimeTravel() as tt:
     assert time.time() == 100200
 ```
 
-`time-travel` also allows you to define I/O event that will "happen":
+`time-travel` also allows you to define I/O event that will "happen"
+during the program:
 
 ```python
 with TimeTravel() as t:
