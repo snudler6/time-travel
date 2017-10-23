@@ -8,6 +8,7 @@ environment:
     - TOXENV: "py35"
     - TOXENV: "py36"
     - TOXENV: "pypy"
+    - TOXENV: "docs"
 
 install:
   - if "%TOXENV%"=="pypy" choco install python.pypy
