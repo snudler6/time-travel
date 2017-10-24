@@ -19,6 +19,34 @@ When loaded, the library mocks modules that access the machine's time
 replaces them with an internal event-pool implementation that lets the user
 choose when time moves forward and which I/O event will happen next.
 
+Imagine testing a state machine that changes states a certain amount of time
+passes. One way to test it would be:
+
+.. code-block:: python
+
+   def test_state_timeout():
+       sm.handle_event(event=...)
+       time.sleep(5)
+       sm.handle_event(event=...)
+       assert sm.state == TIMEOUT
+
+This is problematic for several reasons. First, **your test takes 5 seconds to
+run**, and that's bad. Second, `time.sleep()` isn't accurate, and you want to
+make sure that your code is top notch.
+
+Here's the **better** way to do this using `time-travel`:
+
+.. code-block:: python
+
+   def test_state_timeout():
+       with TimeTravel() as tt:
+           sm.handle_event(event=...)
+           tt.clock.time += 5
+           sm.handle_event(event=...)
+           assert sm.state == TIMEOUT
+
+Your test is now accurate, and immediate.
+
 **time-travel** supports python 2.7, 3.4, 3.5, 3.6 and pypy on both Linux
 and Windows.
 
