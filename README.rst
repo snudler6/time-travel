@@ -11,16 +11,17 @@
 time-travel - time and I/O mocking library
 ==========================================
 
-**time-travel** is a python library that allows users to write deterministic
+**time-travel** is a python library that helps users write deterministic
 tests for time sensitive and I/O intensive code.
 
-When loaded, the library mocks modules that access the machine's time
-(e.g. ``time``, ``datetime``) and I/O event handlers (e.g. ``poll``, ``select``)
-and replaces them with an internal event-pool implementation that lets the user
-choose when time moves forward and which I/O event will happen next.
+Writing good tests can sometimes be a bit tricky, especially when you are
+testing code that uses a lot of I/O and has hard timing constraints.
 
-Imagine testing a state machine that changes states a certain amount of time
-passes. One way to test it would be:
+Testing Time Sensitive Code
+---------------------------
+
+Imagine testing a state machine that times out after some time passes.
+One way to test it would be:
 
 .. code-block:: python
 
@@ -30,11 +31,15 @@ passes. One way to test it would be:
        sm.handle_event(event=...)
        assert sm.state == TIMEOUT
 
-This is bad for several reasons. First, **your test takes 5 seconds to run**.
-Second, ``time.sleep()`` isn't accurate and this test might fail randomly.
-There's nothing worse than a Heisenbuild. Well, perhaps a **SLOW** Heisenbuild.
+This is bad for several reasons:
 
-Here's the **better** way to do this using `time-travel`:
+* **your test takes 5 seconds to run**. That's a no-no.
+* ``time.sleep()`` promises that the process will sleep ``x`` seconds
+  **at most**. This test might fail randomly, depends on how sensitive your
+  state machine is.
+
+There's nothing worse than a Heisenbuild. Well, perhaps a **SLOW** Heisenbuild.
+Here's the **better** way to do this using ``time-travel``:
 
 .. code-block:: python
 
@@ -45,48 +50,38 @@ Here's the **better** way to do this using `time-travel`:
            sm.handle_event(event=...)
            assert sm.state == TIMEOUT
 
-Your test is now accurate, immediate and consistent.
+When the ``handle_event`` method is called, it will probably check the time
+using the ``time`` or ``datetime`` module. These modules are mocked by
+``time-travel`` and return the value stored in ``TimeTravel.clock.time``.
 
-**time-travel** supports python 2.7, 3.4, 3.5, 3.6 and pypy on both Linux
+From now on, your time sensitive tests will run faster, more accurate, and your
+build will be consistent.
+
+Testing Time I/O Code
+---------------------
+
+``time-travel`` also mocks I/O event interfaces such as ``select`` and ``poll``.
+
+Testing code that uses ``select`` is easy - you just inject a real socket object
+and send data to it from your test code. But what about timeouts? Testing
+behaviour that occurs on timeout forces you to actually **wait**! That's bananas!
+
+Here's how you'd do it with ``time-travel``:
+
+.. code-block:: python
+
+   def test_state_timeout():
+       with TimeTravel() as tt:
+           sock = socket.socket()
+           tt.add_future_event(2, sock, tt.event_types.select.WRITE)
+           assert select.select([sock], [sock], []) == ([], [sock], [])
+           assert select.select([sock], [sock], [], 100) == ([], [], [])
+
+Once again, this code will run instantly.
+Oh yes, and ``sock`` doesn't even have to be a socket object :)
+
+**time-travel** supports python 2.7, 3.4, 3.5, 3.6 and pypy2 on both Linux
 and Windows.
-
-Quick start
------------
-
-Install
-^^^^^^^
-
-.. code::
-
-   pip install time_travel
-
-Usage
-^^^^^
-
-With `time-travel`, the following piece of code runs instantaneously:
-
-.. code-block:: python
-
-   from time_travel import TimeTravel
-
-   with TimeTravel() as tt:
-       tt.clock.time = 100000
-       assert time.time() == 100000
-       time.sleep(200)
-       assert time.time() == 100200
-
-`time-travel` also allows you to define I/O event that will "happen"
-during the program:
-
-.. code-block:: python
-
-   with TimeTravel() as t:
-       sock = socket.socket()
-       t.add_future_event(time_from_now=2, sock, t.event_types.select.WRITE)
-
-       now = t.clock.time
-       assert select.select([], [sock], []) == ([], [sock], [])
-       assert time.time() == now + 2
 
 For detailed information and usage examples, see the
 `full documentation <http://time-travel.readthedocs.io/en/latest/>`_. You know
