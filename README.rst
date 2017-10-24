@@ -30,9 +30,9 @@ passes. One way to test it would be:
        sm.handle_event(event=...)
        assert sm.state == TIMEOUT
 
-This is problematic for several reasons. First, **your test takes 5 seconds to
-run**, and that's bad. Second, ``time.sleep()`` isn't accurate and might fail
-this test randomly, and you want to make sure that your code is consistent.
+This is bad for several reasons. First, **your test takes 5 seconds to run**.
+Second, ``time.sleep()`` isn't accurate and this test might fail randomly.
+There's nothing worse than a Heisenbuild.
 
 Here's the **better** way to do this using `time-travel`:
 
@@ -45,7 +45,7 @@ Here's the **better** way to do this using `time-travel`:
            sm.handle_event(event=...)
            assert sm.state == TIMEOUT
 
-Your test is now accurate, and immediate.
+Your test is now accurate, immediate and consistent.
 
 **time-travel** supports python 2.7, 3.4, 3.5, 3.6 and pypy on both Linux
 and Windows.
