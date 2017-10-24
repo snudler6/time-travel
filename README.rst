@@ -15,8 +15,8 @@ time-travel - time and I/O mocking library
 tests for time sensitive and I/O intensive code.
 
 When loaded, the library mocks modules that access the machine's time
-(e.g. `time`, `datetime`) and I/O event handlers (e.g. `poll`, `select`) and
-replaces them with an internal event-pool implementation that lets the user
+(e.g. ``time``, ``datetime``) and I/O event handlers (e.g. ``poll``, ``select``)
+and replaces them with an internal event-pool implementation that lets the user
 choose when time moves forward and which I/O event will happen next.
 
 Imagine testing a state machine that changes states a certain amount of time
@@ -31,8 +31,8 @@ passes. One way to test it would be:
        assert sm.state == TIMEOUT
 
 This is problematic for several reasons. First, **your test takes 5 seconds to
-run**, and that's bad. Second, `time.sleep()` isn't accurate, and you want to
-make sure that your code is top notch.
+run**, and that's bad. Second, ``time.sleep()`` isn't accurate and might fail
+this test randomly, and you want to make sure that your code is consistent.
 
 Here's the **better** way to do this using `time-travel`:
 
