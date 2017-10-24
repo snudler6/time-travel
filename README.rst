@@ -32,7 +32,7 @@ passes. One way to test it would be:
 
 This is bad for several reasons. First, **your test takes 5 seconds to run**.
 Second, ``time.sleep()`` isn't accurate and this test might fail randomly.
-There's nothing worse than a Heisenbuild.
+There's nothing worse than a Heisenbuild. Well, perhaps a **SLOW** Heisenbuild.
 
 Here's the **better** way to do this using `time-travel`:
 
@@ -89,7 +89,8 @@ during the program:
        assert time.time() == now + 2
 
 For detailed information and usage examples, see the
-`full documentation <http://time-travel.readthedocs.io/en/latest/>`_.
+`full documentation <http://time-travel.readthedocs.io/en/latest/>`_. You know
+you want to.
 
 Links
 =====
