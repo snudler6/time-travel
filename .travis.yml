@@ -21,3 +21,5 @@ matrix:
       env: TOXENV=py36
     - python: pypy
       env: TOXENV=pypy
+    - python: 3.6
+      env: TOXENV=docs
