@@ -46,7 +46,7 @@ This is bad for several reasons:
   state machine is.
 
 There's nothing worse than a heisenbuild (well, perhaps a **SLOW** heisenbuild).
-Here's the **better** way to do this using ``time-travel``:
+Here's a **better** way to do this using ``time-travel``:
 
 .. code-block:: python
 
@@ -57,8 +57,8 @@ Here's the **better** way to do this using ``time-travel``:
            sm.handle_event(event=...)
            assert sm.state == TIMEOUT
 
-When the ``handle_event`` method is called, it will probably check the time
-using the ``time`` or ``datetime`` module. These modules are mocked by
+When the ``handle_event`` method is called it will probably check the time
+using one of ``time`` or ``datetime`` modules. These modules are patched by
 ``time-travel`` and return the value stored in ``TimeTravel.clock.time``.
 
 From now on, your time sensitive tests will run faster, accurately, and your

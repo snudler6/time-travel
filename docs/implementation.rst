@@ -21,7 +21,7 @@ them for different patchers.
 
 .. todo::
 
-   Document the patcher's interface with the pool.
+   Document the patcher's interface with the pool (#50).
 
 Writing a Patcher
 -----------------

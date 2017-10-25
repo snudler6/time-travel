@@ -3,7 +3,7 @@ Examples
 
 .. todo::
 
-   Give better examples.
+   Give better examples (#51).
 
 Skip timeouts
 ^^^^^^^^^^^^^

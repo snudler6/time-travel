@@ -35,12 +35,14 @@ The TimeTravel Context Manager
    The initial time for the clock is set to `86,400` seconds since epoc.
    This is because Windows does not support any lower values. Sorry UNIX users!
 
-Performance Issues
-^^^^^^^^^^^^^^^^^^
+Performance
+^^^^^^^^^^^
 
 The way the context manager works is that it changes references to patched
 objects in loaded modules. By default ``time-travel`` searches through
 **every loaded module** in ``sys.modules``. **This takes around 2 seconds**.
+
+**Wait!! Don't leave yet!! We managed to solve this!!!**
 
 To minimize search time, ``time_travel.TimeTravel`` gets a keyword argument
 named ``modules_to_patch``, which is a list of module names to search in.
@@ -53,6 +55,18 @@ For example, let's say you're testing a module named `foobar`:
 
    with TimeTravel(modules_to_patch=['foobar']) as t:
        foobar.dostuff()
+
+This will reduce the replace time to the bare minimum.
+
+.. note::
+
+   When the default search mehtod is used (without the ``modules_to_patch``
+   argument) the following modules are skipped and not patched:
+
+   - ``pytest``
+   - ``unittest``
+   - ``mock``
+   - ``threading``
 
 Moving Through Time
 ^^^^^^^^^^^^^^^^^^^
