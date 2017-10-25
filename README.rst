@@ -54,8 +54,8 @@ using the ``time`` or ``datetime`` module. These modules are mocked by
 From now on, your time sensitive tests will run faster, accurately, and your
 build will be consistent.
 
-Testing Time I/O Code
----------------------
+Testing I/O Code
+----------------
 
 ``time-travel`` also mocks I/O event interfaces such as ``select`` and ``poll``.
 
