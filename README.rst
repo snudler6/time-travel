@@ -14,9 +14,6 @@ time-travel - time and I/O mocking library
 **time-travel** is a python library that helps users write deterministic
 tests for time sensitive and I/O intensive code.
 
-Writing good tests can sometimes be a bit tricky, especially when you are
-testing code that uses a lot of I/O and has hard timing constraints.
-
 Testing Time Sensitive Code
 ---------------------------
 
@@ -33,12 +30,12 @@ One way to test it would be:
 
 This is bad for several reasons:
 
-* **your test takes 5 seconds to run**. That's a no-no.
+* **Your test takes 5 seconds to run**. That's a no-no.
 * ``time.sleep()`` promises that the process will sleep ``x`` seconds
   **at most**. This test might fail randomly, depends on how sensitive your
   state machine is.
 
-There's nothing worse than a Heisenbuild. Well, perhaps a **SLOW** Heisenbuild.
+There's nothing worse than a heisenbuild (well, perhaps a **SLOW** heisenbuild).
 Here's the **better** way to do this using ``time-travel``:
 
 .. code-block:: python
@@ -54,7 +51,7 @@ When the ``handle_event`` method is called, it will probably check the time
 using the ``time`` or ``datetime`` module. These modules are mocked by
 ``time-travel`` and return the value stored in ``TimeTravel.clock.time``.
 
-From now on, your time sensitive tests will run faster, more accurate, and your
+From now on, your time sensitive tests will run faster, accurately, and your
 build will be consistent.
 
 Testing Time I/O Code
@@ -74,10 +71,14 @@ Here's how you'd do it with ``time-travel``:
        with TimeTravel() as tt:
            sock = socket.socket()
            tt.add_future_event(2, sock, tt.event_types.select.WRITE)
-           assert select.select([sock], [sock], []) == ([], [sock], [])
-           assert select.select([sock], [sock], [], 100) == ([], [], [])
+           start = time.time()
+           assert select.select([sock], [sock], []) == ([], [sock], [])  # This will be satisfied after "2 seconds"
+           assert time.time() == start + 2  # You see? 2 seconds!
+           assert select.select([sock], [sock], [], 100) == ([], [], [])  # This is the "timeout"
+           assert time.time() == start + 2 + 100
 
 Once again, this code will run instantly.
+
 Oh yes, and ``sock`` doesn't even have to be a socket object :)
 
 **time-travel** supports python 2.7, 3.4, 3.5, 3.6 and pypy2 on both Linux
