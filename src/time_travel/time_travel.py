@@ -7,14 +7,7 @@ from .event_pool import EventPool
 
 
 class TimeTravel(object):
-    """Context-manager patching time libraries.
-    
-    - For setting timestamps and advancing the time, use the clock object
-      corresponding to the time_machine_clock interface
-      
-    - For setting events for event based libraries (e.g. select) use the
-      event_pool object corresponding to the event_pool interface.
-    """
+    """Context-manager for patching time and I/O libraries."""
     
     class EventTypes(object):
         """Empty class to register events types on."""
@@ -45,7 +38,13 @@ class TimeTravel(object):
                         patcher.get_event_types())
 
     def add_future_event(self, time_from_now, fd, event):
-        """Add an event to the event pool with a relative timestamp."""
+        """Add an event to the event pool.
+
+        :param time_from_now: When will the event happen.
+        :param fd: The descriptor (usually a socket object) that the event will
+                   happen for.
+        :param event: The event that will happen (implementation specific).
+        """
         abs_time = self.clock.time + time_from_now
         self.event_pool.add_future_event(abs_time, fd, event)
 

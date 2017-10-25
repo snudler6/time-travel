@@ -77,7 +77,7 @@ Here's how you'd do it with ``time-travel``:
 
 .. code-block:: python
 
-   def test_state_timeout():
+   def test_select_timeout():
        with TimeTravel() as tt:
            sock = socket.socket()
            tt.add_future_event(2, sock, tt.event_types.select.WRITE)
