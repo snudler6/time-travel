@@ -14,6 +14,16 @@ time-travel - time and I/O mocking library
 **time-travel** is a python library that helps users write deterministic
 tests for time sensitive and I/O intensive code.
 
+**time-travel** supports python 2.7, 3.4, 3.5, 3.6 and pypy2 on both Linux
+and Windows.
+
+Install
+-------
+
+.. code:: bash
+
+   $ pip install time_travel
+
 Testing Time Sensitive Code
 ---------------------------
 
@@ -32,7 +42,7 @@ This is bad for several reasons:
 
 * **Your test takes 5 seconds to run**. That's a no-no.
 * ``time.sleep()`` promises that the process will sleep ``x`` seconds
-  **at most**. This test might fail randomly, depends on how sensitive your
+  **at most**. This test might fail randomly, depending on how sensitive your
   state machine is.
 
 There's nothing worse than a heisenbuild (well, perhaps a **SLOW** heisenbuild).
@@ -81,8 +91,6 @@ Once again, this code will run instantly.
 
 Oh yes, and ``sock`` doesn't even have to be a socket object :)
 
-**time-travel** supports python 2.7, 3.4, 3.5, 3.6 and pypy2 on both Linux
-and Windows.
 
 For detailed information and usage examples, see the
 `full documentation <http://time-travel.readthedocs.io/en/latest/>`_. You know
