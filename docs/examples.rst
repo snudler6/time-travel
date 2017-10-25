@@ -1,6 +1,10 @@
 Examples
 ========
 
+.. todo::
+
+   Give better examples.
+
 Skip timeouts
 ^^^^^^^^^^^^^
 
