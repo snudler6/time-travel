@@ -89,7 +89,7 @@ Here's how you'd do it with ``time-travel``:
 
 Once again, this code will run instantly.
 
-Oh yes, and ``sock`` doesn't even have to be a socket object :)
+Oh yes, ``sock`` doesn't even have to be a socket object :)
 
 
 For detailed information and usage examples, see the
