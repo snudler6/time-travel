@@ -8,6 +8,9 @@
     :target: http://time-travel.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
+.. image:: https://img.shields.io/pypi/pyversions/time-travel.svg
+    :target: https://pypi.org/project/time-travel
+
 time-travel - time and I/O mocking library
 ==========================================
 
