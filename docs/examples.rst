@@ -34,10 +34,10 @@ Tests are deterministic and take no time with time travel. For example:
        module1.very_long_method()
        module2.time_sensitive_method()
 
-Patching event based modules
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Patching I/O events modules
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Can Patch and determine future events for event based modules using select:
+With ``time-travel`` you can fake future events for I/O modules:
 
 .. code-block:: python
 
