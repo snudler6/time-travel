@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import select
 
 
@@ -6,14 +6,14 @@ version = '1.1.0'
 
 
 patchers = [
-    'datetime_patcher = src.time_travel.patchers.datetime_patcher:DatetimePatcher',
-    'select_patcher = src.time_travel.patchers.select_patcher:SelectPatcher',
-    'time_patcher = src.time_travel.patchers.time_patcher:TimePatcher',
+    'datetime_patcher = time_travel.patchers.datetime_patcher:DatetimePatcher',
+    'select_patcher = time_travel.patchers.select_patcher:SelectPatcher',
+    'time_patcher = time_travel.patchers.time_patcher:TimePatcher',
 ]
 
 
 if hasattr(select, 'poll'):
-    patchers.append('poll_patcher = src.time_travel.patchers.poll_patcher:PollPatcher')
+    patchers.append('poll_patcher = time_travel.patchers.poll_patcher:PollPatcher')
 
 
 setup(
@@ -41,7 +41,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Topic :: Software Development :: Testing',
     ],
-    packages=('time_travel',),
+    packages=find_packages('src', exclude=["tests*"]),
     package_dir={'': 'src'},
     entry_points={
         'time_travel.patchers': patchers,
