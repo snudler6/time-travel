@@ -27,11 +27,11 @@ class TestPollPatcher(object):
         self.patcher.start()
 
         self.poll = select.poll()
-    
+
     def teardown_method(self, method):
         """Stop the poll patcher"""
         self.patcher.stop()
-        
+
     def test_empty_with_timeout(self):
         assert self.poll.poll(sec2msec(11)) == []
         assert self.clock.time == _t(11)
@@ -57,28 +57,28 @@ class TestPollPatcher(object):
 
         assert self.poll.poll(sec2msec(5)) == []
         assert self.clock.time == _t(5)
-        
+
     def test_unregistered_events(self):
         first_sock = socket.socket()
         second_sock = socket.socket()
         expected_sock = socket.socket()
-        
+
         self.event_pool.add_future_event(_t(3), first_sock, select.POLLIN)
         self.event_pool.add_future_event(_t(4), second_sock, select.POLLIN)
         self.event_pool.add_future_event(_t(5), expected_sock, select.POLLIN)
 
         self.poll.register(expected_sock, select.POLLIN)
-        
+
         assert self.poll.poll() == [(expected_sock, select.POLLIN)]
         assert self.clock.time == _t(5)
-        
+
     def test_multiple_sockets_same_time(self):
         sock1 = socket.socket()
         sock2 = socket.socket()
         sock3 = socket.socket()
         far_sock = socket.socket()
         unwaited_sock = socket.socket()
-        
+
         self.event_pool.add_future_event(_t(3), sock1, select.POLLIN)
         self.event_pool.add_future_event(_t(3), sock2, select.POLLIN)
         self.event_pool.add_future_event(_t(3), sock3, select.POLLIN)
@@ -120,7 +120,7 @@ class TestPollPatcher(object):
 
     def test_event_not_returned_twice(self):
         sock = socket.socket()
-        
+
         self.event_pool.add_future_event(_t(3), sock, select.POLLIN)
         self.poll.register(sock, select.POLLIN)
 
@@ -129,10 +129,10 @@ class TestPollPatcher(object):
 
         assert self.poll.poll(sec2msec(5)) == []
         assert self.clock.time == _t(3 + 5)
-          
+
     def test_same_event_multiple_timestamps(self):
         sock = socket.socket()
-        
+
         self.event_pool.add_future_event(_t(1), sock, select.POLLIN)
         self.event_pool.add_future_event(_t(2), sock, select.POLLIN)
         self.event_pool.add_future_event(_t(2), sock, select.POLLOUT)

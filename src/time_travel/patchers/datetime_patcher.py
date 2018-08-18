@@ -18,11 +18,11 @@ _real_date = datetime.date
 def with_metaclass(meta, name, *bases):
     """Create a base class with a metaclass."""
     return meta(name, bases, {})
-    
+
 
 class DateSubclassMeta(type):
     """Date mock metaclass to check instancechek to the real class."""
-    
+
     @classmethod
     def __instancecheck__(mcs, obj):
         return isinstance(obj, _real_date)
@@ -30,7 +30,7 @@ class DateSubclassMeta(type):
 
 class DatetimeSubclassMeta(DateSubclassMeta):
     """Datetime mock metaclass to check instancechek to the real class."""
-    
+
     @classmethod
     def __instancecheck__(mcs, obj):
         return isinstance(obj, _real_datetime)
@@ -57,7 +57,7 @@ def datetime_to_fakedatetime(datetime):
 
 class FakeDate(with_metaclass(DateSubclassMeta, 'date', _real_date)):
     """Mocked datetime.date class."""
-    
+
     def __new__(cls, *args, **kwargs):
         """Return a new mocked date object."""
         return _real_date.__new__(cls, *args, **kwargs)
@@ -76,7 +76,7 @@ FakeDate.max = date_to_fakedate(_real_date.max)
 class FakeDatetime(with_metaclass(DatetimeSubclassMeta, 'datetime',
                                   _real_datetime, FakeDate)):
     """Mocked datetime.datetime class."""
-    
+
     def __new__(cls, *args, **kwargs):
         """Return a new mocked datetime object."""
         return _real_datetime.__new__(cls, *args, **kwargs)
@@ -133,46 +133,46 @@ def pickle_fake_datetime(datetime_):
 
 class DatetimePatcher(BasePatcher):
     """Patcher of the datetime module.
-    
+
     patching:
         - datetime.today
         - datetime.now
         - datetime.utcnow
         - date.today
     """
-    
+
     def __init__(self, **kwargs):
         """Create the patcher."""
         super(DatetimePatcher, self).__init__(patcher_module=__name__,
                                               **kwargs)
-        
+
         FakeDate._now = self._now
         FakeDatetime._now = self._now
-        
+
     def get_patched_module(self):
         """Return the actual module obect to be patched."""
         return datetime
-        
+
     def get_patch_actions(self):
         """Return list of the patches to do."""
         return [
             ('date', _real_date, FakeDate),
             ('datetime', _real_datetime, FakeDatetime)
         ]
-        
+
     def start(self):
         """Change pickle function for datetime to handle mocked datetime."""
         super(DatetimePatcher, self).start()
-        
+
         copyreg.dispatch_table[_real_datetime] = pickle_fake_datetime
         copyreg.dispatch_table[_real_date] = pickle_fake_date
-        
+
     def stop(self):
         """Return pickle behavior to normal."""
         copyreg.dispatch_table.pop(_real_datetime)
         copyreg.dispatch_table.pop(_real_date)
-        
+
         super(DatetimePatcher, self).stop()
-            
+
     def _now(self):
         return _real_datetime.fromtimestamp(self.clock.time)

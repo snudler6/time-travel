@@ -8,19 +8,19 @@ from .event_pool import EventPool
 
 class TimeTravel(object):
     """Context-manager for patching time and I/O libraries."""
-    
+
     class EventTypes(object):
         """Empty class to register events types on."""
-    
+
     def __init__(self, start_time=MIN_START_TIME, **kwargs):
         """Create the patch.
-        
+
         @start_time is time in seconds since the epoch.
         """
         self.event_pool = EventPool()
         self.clock = TimeMachineClock(start_time, [self.event_pool])
 
-        patches = [] 
+        patches = []
         for patcher in pkg_resources.iter_entry_points(
                 group='time_travel.patchers'):
             patches.append(patcher.load())
@@ -28,9 +28,9 @@ class TimeTravel(object):
         self.patches = [patcher(clock=self.clock, event_pool=self.event_pool,
                                 **kwargs)
                         for patcher in patches]
-        
+
         self.event_types = self.EventTypes()
-        
+
         for patcher in self.patches:
             if patcher.get_events_namespace() is not None:
                 setattr(self.event_types,
@@ -61,6 +61,6 @@ class TimeTravel(object):
     def __enter__(self):
         self.start()
         return self
-        
+
     def __exit__(self, *args):
         self.stop()
