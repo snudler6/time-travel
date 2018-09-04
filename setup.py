@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import select
 
 
-version = '1.1.1'
+version = '1.1.2'
 
 
 patchers = [
