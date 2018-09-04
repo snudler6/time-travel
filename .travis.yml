@@ -23,4 +23,5 @@ deploy:
     secure: TRtECP18wqVrYw52lSYffJZNi8N0Sx2ZU+DOplA0KDknRn6DeZzPhzD3t0SMn9E2b2tLnOIKQ/A5CDWQbcUIjCnTAMVPaYVWE1lVx1frCXDO6X+spQD2JqQMbuOvMwm+OIgkgf5VIdLYP0wsEEoaI0zmn3caKQPsibTjJq7P+9/nIEZY9rqpUCboST6aUqC/tuntwtk7zirEQYcS9/aI2JmrCrqkgNAp9UfE2JG2ncT8xYZZRO62xEAhXBAW6BDXiPS1E0C/N/Qtkksm+fRaGmPxsOvAB+pUDua712JADfd+R8RRkr8YspWThN37POz363YxTuC6QAhq/YEj9JaJS/7lf059w3dzYO1y8DUjL6Ts1kN+fgZv4T1eBG2ymAml9+aSleEtEtCQXpfEOyPIjdLBlwf970jjdqRH4zh3bZX0JAQz5pJgB8ifzOOud8h3I9hqCqM499y0yjtQVfwu6GoWgl1AcnFaUobDCHRHyPCtSsrcfVVhwgaXqbqj4wjEN/XCcgX9wyfhfq0isoPmH/W5mBO/LIB0QPIYusOKcXvcaaEhV5+UAcMAhDb8sfTQlk7596i3dWr7qw5OynZ7co5cVwa3KkVbj/5FpSmgT9KUb15xvq+sgQ1yapGuBoJtmpTd+gq/FFSqMxVTOxNxG2sTJ5flt5xL9Z1zeehLppw=
   on:
     tags: true
+    python: '3.6'
   distributions: "sdist bdist_wheel"
