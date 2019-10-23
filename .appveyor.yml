@@ -13,7 +13,7 @@ install:
   - if "%TOXENV%"=="pypy" choco install python.pypy
   - if "%TOXENV%"=="pypy" set PATH=C:\tools\pypy\pypy;%PATH% # so tox can find pypy
 
-  - pip install --upgrade tox pip --user
+  - pip install tox
 
 build: off
 
