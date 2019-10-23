@@ -17,7 +17,7 @@ time-travel - time and I/O mocking library
 **time-travel** is a python library that helps users write deterministic
 tests for time sensitive and I/O intensive code.
 
-**time-travel** supports python 2.7, 3.4, 3.5, 3.6 and pypy2 on both Linux
+**time-travel** supports python 2.7, 3.5, 3.6, 3.7 and pypy2 on both Linux
 and Windows.
 
 Install
