@@ -1,9 +1,7 @@
 from setuptools import setup, find_packages
 import select
 
-
 version = '1.1.2'
-
 
 patchers = [
     'datetime_patcher = time_travel.patchers.datetime_patcher:DatetimePatcher',
