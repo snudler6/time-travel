@@ -3,7 +3,6 @@ environment:
     # For Python versions available on Appveyor, see
     # http://www.appveyor.com/docs/installed-software#python
     - TOXENV: "py27"
-    - TOXENV: "py34"
     - TOXENV: "py35"
     - TOXENV: "py36"
     - TOXENV: "pypy"
