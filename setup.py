@@ -12,6 +12,8 @@ patchers = [
 
 if hasattr(select, 'poll'):
     patchers.append('poll_patcher = time_travel.patchers.poll_patcher:PollPatcher')
+if hasattr(select, 'epoll'):
+    patchers.append('epoll_patcher = time_travel.patchers.epoll_patcher:EpollPatcher')
 
 
 setup(

@@ -1,4 +1,5 @@
 from time_travel.patchers.poll_patcher import PollPatcher
+from time_travel.patchers.epoll_patcher import EpollPatcher
 from time_travel.time_machine_clock import TimeMachineClock
 from time_travel.event_pool import EventPool
 from .utils import _t
@@ -21,12 +22,18 @@ class TestPollPatcher(object):
         """Start a poll patcher"""
         self.event_pool = EventPool()
         self.clock = TimeMachineClock(clock_listeners=[self.event_pool])
-        self.patcher = PollPatcher(self.clock,
-                                   self.event_pool,
-                                   modules_to_patch=__name__)
+        self.patcher = self.get_patcher(self.clock,
+                                        self.event_pool,
+                                        modules_to_patch=__name__)
         self.patcher.start()
 
-        self.poll = select.poll()
+        self.poll = self.get_poll()
+
+    def get_poll(self):
+        return select.poll()
+
+    def get_patcher(self, *args, **kwargs):
+        return PollPatcher(*args, **kwargs)
 
     def teardown_method(self, method):
         """Stop the poll patcher"""
@@ -177,3 +184,13 @@ class TestPollPatcher(object):
 
         assert self.poll.poll() == [(sock, select.POLLOUT)]
         assert self.clock.time == _t(10)
+
+
+@pytest.mark.skipif(not hasattr(select, 'epoll'),
+                    reason='select.epoll is not supported in this platform')
+class TestEpollPatcher(TestPollPatcher):
+    def get_poll(self):
+        return select.epoll()
+
+    def get_patcher(self, *args, **kwargs):
+        return EpollPatcher(*args, **kwargs)
