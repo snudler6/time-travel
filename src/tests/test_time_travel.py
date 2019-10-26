@@ -125,3 +125,18 @@ def test_poll():
         now = t.clock.time
         assert poll.poll() == [(sock, select.POLLIN)]
         assert time.time() == now + 2
+
+
+@pytest.mark.skipif(not hasattr(select, 'epoll'),
+                    reason='select.epoll is not supported in this platform')
+def test_epoll():
+    with TimeTravel(modules_to_patch=__name__) as t:
+        sock = socket.socket()
+        t.add_future_event(2, sock, select.POLLIN)
+
+        poll = select.epoll()
+        poll.register(sock, select.POLLIN | select.POLLOUT)
+
+        now = t.clock.time
+        assert poll.poll() == [(sock, select.POLLIN)]
+        assert time.time() == now + 2

@@ -1,9 +1,7 @@
 from setuptools import setup, find_packages
 import select
 
-
 version = '1.1.2'
-
 
 patchers = [
     'datetime_patcher = time_travel.patchers.datetime_patcher:DatetimePatcher',
@@ -14,6 +12,8 @@ patchers = [
 
 if hasattr(select, 'poll'):
     patchers.append('poll_patcher = time_travel.patchers.poll_patcher:PollPatcher')
+if hasattr(select, 'epoll'):
+    patchers.append('epoll_patcher = time_travel.patchers.epoll_patcher:EpollPatcher')
 
 
 setup(
@@ -31,9 +31,9 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
