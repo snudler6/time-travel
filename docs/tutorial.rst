@@ -60,7 +60,7 @@ This will reduce the replace time to the bare minimum.
 
 .. note::
 
-   When the default search mehtod is used (without the ``modules_to_patch``
+   When the default search method is used (without the ``modules_to_patch``
    argument) the following modules are skipped and not patched:
 
    - ``pytest``
