@@ -45,7 +45,7 @@ class EventPool(object):
             out = []
 
             for fd, event_set in _ts_dict.items():
-                out_events = {event for event in event_set if 
+                out_events = {event for event in event_set if
                               predicate(fd, event)}
 
                 if out_events:
